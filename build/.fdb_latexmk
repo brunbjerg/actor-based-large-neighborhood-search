@@ -1,0 +1,11 @@
+# Fdb version 4
+["pdflatex"] 1713963885.10178 "/usr/share/texmf-dist/tex/latex/tools/.tex" "build/.pdf" "" 1713964035.38221 2
+  "/usr/share/texmf-dist/tex/latex/tools/.tex" 1713199481 1386 e12910b1679ec687be15153859582c13 ""
+  "/usr/share/texmf-dist/web2c/texmf.cnf" 1713199481 41588 b43d3e860a4f94167ee1e725ff526a72 ""
+  "/var/lib/texmf/web2c/pdftex/pdflatex.fmt" 1713371493 7112998 aa46d12c09e7e7148837ef8c5d44d9c5 ""
+  "build/.aux" 1713963885.09736 32 3985256e7290058c681f74d7a3565a19 "pdflatex"
+  (generated)
+  "build/.aux"
+  "build/.log"
+  "build/.pdf"
+  (rewritten before read)
