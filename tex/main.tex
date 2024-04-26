@@ -50,7 +50,7 @@
 %% for the whole article with \linenumbers.
 %% \usepackage{lineno}
 
-\journal{Nuclear Physics B}
+\journal{Computers and Operation Research}
 
 \begin{document}
 
@@ -82,8 +82,6 @@
 %% \fntext[label3]{}
 
 \title{Actor-based Large Neighborhood Search} %% Article title
-
-
 
 %% use optional labels to link authors explicitly to addresses:
 %% \author[label1,label2]{}
@@ -154,27 +152,29 @@ Large Neighborhood Search \sep Actor Framework \sep Real-time Optimization \sep 
 \section{Introduction}
 \label{sec1}
 %% Labels are used to cross-reference an item using \ref command.
-Many problems that face the operation research field are hard to solve due to the need of tight integration within companies that (meta)heuristics and models 
-are usually tested with. To solve operation research problems that are highly operational in nature there is a need for metaheuristics that are more 
-responsive, that work with the user, and that allows for tight integration into user work-flows \cite{interactive-optimization-methods}. Operations in are often
-characterized by extensive amounts negotiation and feedback on proposed solutions to general operations research problems (!!!). This often lead to a situation
-where operation research methods are not used to solve the problem that their underlying model proposes to solve and instead end up providing suggestions 
-instead of a complete solution (!!!). Operations in are often
-characterized by extensive amounts negotiation and feedback on proposed solutions to general operations research problems (!!!). This often lead to a situation
-where operation research methods are not used to solve the problem that their underlying model proposes to solve and instead end up providing suggestions 
-instead of a complete solution (!!!). This paper proposes a solution method that will allow for real-time optimization based on user-interaction (effective 
-altering the parameter space) and real-time connection to data sources, such to a database connections. To illustrate the solution method a variant of the
-knapsack problem has been chosen, specifically the multi-compartment multi-knapsack problem on a large dataset. Furthermore the large neighborhood search 
-metaheuristic has been chosen due to its properties of being able to work with and fix infeasible solutions. 
+
+Many problems that face the operation research field are hard to solve due to the need of tight integration tacit knowledge found in the minds of the 
+the decision makers that have to make decision based on solutions provided by operation research methods such as metaheuristics and models. 
+To solve operation research problems that are highly operational in nature there is a need for metaheuristics that are: 1.  
+responsive, 2. able to be assimilated into the decision makers workflow, and 3. allows for integration into dynamic data source such as traditional databases \citep{meignan_review_2015}. 
+Operational aspects of operation research, as opposed to strategic and tactical aspects, are often characterized by by extensive amounts negotiation and feedback on 
+proposed solutions to general operations research problems (!!!). This often lead to a situation
+where operation research methods are not used to solve the problem that their underlying model proposes to solve and instead provides intial suggestions 
+instead of a complete solution \cite{meignan_review_2015} . Operations are often
+characterized by extensive amounts negotiation and feedback on proposed "solutions" between relevant stakeholders. This often lead to a situation
+where operation research methods are not used to solve the problem that their underlying model proposes to solve and instead end up providing suggestions. 
+
+This paper proposes a solution method that will allow for real-time optimization based on user-interaction (effectively altering the parameter space) and real-time 
+connection to data sources, such to a database connections. The proposed solution method will be based on the multi-compartment multi-knapsack problem on a large dataset. 
+Furthermore the large neighborhood search metaheuristic has been chosen due to its properties of being able to work with and fix infeasible solutions. 
 
 The paper is divided into four different sections. Section \ref{sec2} explains the model and method in detail that form the fundation of the paper. 
 Section \ref{sec3} shows that results coming from the implemented system where the system will be affected by simulated user-interaction. Section \ref{sec4} 
 will discuss the implications of the research and possible future research directions.
 
-%% Use \subsection commands to start a subsection.
-\section{Solution Method}
-\label{sec2}
 
+
+%% Use \subsection commands to start a subsection.
 
 \subsection{The Multi-compartment Multi-knapsack Problem with capacity penalties}
 \label{sub1sec2}
@@ -190,18 +190,33 @@ the $c_{kc}$ in knapsack k for compartment c.
 
 \begin{alignat}{2}
 	& \text{Min} \quad \sum_{i = 1}^{I} \sum_{k = 1}^{K} v_{ik} \cdot x_{ik} - \sum_{k = 1}^{K} \sum_{c = 1}^C d \cdot p_{kc} \label{eqn:objective_function_strategic} \\[1em]
-    & \text{subject to:} \notag                                                                                                                                         \\[1em]
-	& \sum_{i=1}^I w_{ic} \cdot x_{ik} \leq \ cap_{kc} + p_{kc}        && \forall k \in K, \forall c \in C         \label{eqn:capacity_constraint}          \\[1em]
-	& \sum_{i = 1}^{I} x_{ik} \leq \ 1                               && \forall k \in K                                \label{eqn:single_workorder_constraint}  \\[1em]
+    & \text{subject to:} \notag                                                                                                                                        \\[1em]
+	& \sum_{i=1}^I w_{ic} \cdot x_{ik} \leq \ cap_{kc} + p_{kc}        && \forall k \in K, \forall c \in C                    \label{eqn:capacity_constraint}          \\[1em]
+	& \sum_{i = 1}^{I} x_{ik} \leq \ 1                               && \forall k \in K                                       \label{eqn:single_workorder_constraint}  \\[1em]
 	& x_{ik} = 0                                                     && \forall (i, k) \in Q                                  \label{eqn:exclusion_constraint}         \\[1em]
-	& x_{ik} = 1                                                     && \forall (i, k) \in P                                  \label{eqn:inclusion_constraint}                                                                                                \\[1em]
-	& x_{ik} \in \{0, 1\}                                            && \forall i \in I, \forall k \in K        \label{eqn:x_integrality_constraint}     \\[1em] 
-	& p_{kc} \in \mathbb{R}^{+}                                      && \forall k \in K, \forall c \in C        \label{eqn:p_non_negativity_constraint}
+	& x_{ik} = 1                                                     && \forall (i, k) \in P                                  \label{eqn:inclusion_constraint}         \\[1em]
+	& x_{ik} \in \{0, 1\}                                            && \forall i \in I, \forall k \in K                      \label{eqn:x_integrality_constraint}     \\[1em] 
+	& p_{kc} \in \mathbb{R}^{+}                                      && \forall k \in K, \forall c \in C                      \label{eqn:p_non_negativity_constraint}
 \end{alignat}
 
-Here a series of knapsacks 
+
+In this paper we will specifically look at the effects of changing Q, P, cap, and v in real-time and illustrate the effects that this approach has on the solution and the objective value.
+
+\section{Solution Method}
+\label{sec2}
+
+\subsection{Large Neighborhood Search}
 
 \subsection{Actor-based Large Neighborhood Search}
+
+A problem that is subject to user-interaction and requires real-time feedback you need an optimization approach that is able to repair infeasible solutions and while also 
+converging quickly. For this the large neighborhood search metaheuristic has been shown satisfy these requirements in the literature \cite{gendreau_handbook_2019}. 
+
+The LNS metaheuristic is in its most basic form implicitly defined for static problems meaning that the parameters that make up the problem instance is not subject to change 
+after the algorithm has been started. To make the LNS able adapt to incoming information in real-time a message system have been implemented on top of the existing framework.
+
+This extension is shown in algorithm \ref{algo1}.
+
 \begin{algorithm}[H]
 \caption{Actor-based Large Neighborhood Search}  \label{algo1}
 \begin{algorithmic}[1]
@@ -221,8 +236,8 @@ Here a series of knapsacks
     \If{accept(x$^t$,\ x)}                       \label{alg:acceptance_criteria_start}
         \State x = x$^t$
     \EndIf                                       \label{alg:acceptance_criteria_end}
-    \If{c(x$^t$) $<$ c(x$^b$)}   \label{alg:objective_start}
-        \State x$^b$ $=$ x$^t$
+    \If{c(x$^t$) $<$ c(x$^b$)}                   \label{alg:objective_start}
+        \State x$^b$ $=$ x$^$
 		\State queue($x^b$)
     \EndIf                                       \label{alg:objective_end}
 \EndRepeat
@@ -230,6 +245,19 @@ Here a series of knapsacks
 \end{algorithmic}
 \end{algorithm}
 
+The basic LNS setup have here been extended with a `message queue`. This message queue will be read from on every iteration of the LNSs main iteration loop. And here we should notice that the 
+incoming message are able to change both the solutoin but also the problem instance itself. Here we see one of the defining features of the LNS metaheuristic in play, that due to its inherrent 
+property of being able to optimize a solution that have become infeasible which is something that is very likely to happen when you change the parameter of the problem instance itself. 
+
+Another less obvious property the message queue allows is for the algorithm to run indefinitely and instead of restarting the algorithm you instead pass messages to it to allow it be adjust both the solution space and the parameter space.
+This property avoid the issue of time consuming initial convergence as the algorithm will be found in an optimimal state when the solution is perturbed.  
+
+\section{Results}
+This results section will show how the proposed solution method will react to incoming inputs into the 
+
+
+\section{Discussion}
+(MICROSERVICE SOURCE)
 %% Use \subsubsection, \paragraph, \subparagraph commands to 
 %% start 3rd, 4th and 5th level sections.
 %% Refer following link for more details.
@@ -237,6 +265,7 @@ Here a series of knapsacks
 
 
 %% Displayed equations can be tagged using various environments. 
+
 %% Single line equations can be tagged using the equation environment.
 %% Unnumbered equations are tagged using starred versions of the environment.
 %% amsmath package needs to be loaded for the starred version of equation environment.
@@ -305,7 +334,8 @@ Here a series of knapsacks
 
 %% Refer following link for more details about bibliography and citations.
 %% https://en.wikibooks.org/wiki/LaTeX/Bibliography_Management
-\bibliography{../bib/refs}
+\bibliography{/home/scipo/coding/papers/actor-based-large-neighborhood-search/bib/refs}
+
 \bibliographystyle{elsarticle-harv}
 \end{document}
 
