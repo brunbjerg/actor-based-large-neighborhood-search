@@ -12,7 +12,7 @@
 %% version 1999/12/01 or later.
 %% 
 %% The list of all files belonging to the 'Elsarticle Bundle' is
-%% given in the file `manifest.txt'.
+ %% given in the file `manifest.txt'.
 %% 
 %% Template article for Elsevier's document class `elsarticle'
 %% with harvard style bibliographic references
@@ -224,7 +224,7 @@ This extension is shown in algorithm \ref{algo1}.
 \State \textbf{Input} P     = problem instance
 \State \textbf{Input} x     = initial solution
 \State x$^b$ = x 
-\Repeat
+\While{true}
 	\If{!queue.is\_empty}
         \State m = queue.pop()
         \State x.update(m)
@@ -237,10 +237,10 @@ This extension is shown in algorithm \ref{algo1}.
         \State x = x$^t$
     \EndIf                                       \label{alg:acceptance_criteria_end}
     \If{c(x$^t$) $<$ c(x$^b$)}                   \label{alg:objective_start}
-        \State x$^b$ $=$ x$^$
+        \State $x^b = x^b$
 		\State queue($x^b$)
     \EndIf                                       \label{alg:objective_end}
-\EndRepeat
+\EndWhile
 \Return $x^b$
 \end{algorithmic}
 \end{algorithm}
@@ -253,11 +253,117 @@ Another less obvious property the message queue allows is for the algorithm to r
 This property avoid the issue of time consuming initial convergence as the algorithm will be found in an optimimal state when the solution is perturbed.  
 
 \section{Results}
-This results section will show how the proposed solution method will react to incoming inputs into the 
+This results section will 1. introduce the data instance 2. show the effect of forcing item set in the specific knapsacks 3. show the effect of changing the 
+knapsack capacities, and 4. show the effect of dynamically changing the item set weights. 
 
+\section{Data Instance}
+
+
+\begin{table}[t]
+\centering
+\begin{tabular}{|c|c|c|c|c|}
+\hline
+           & \begin{tabular}[c]{@{}c@{}}Number of\\ Item Sets\end{tabular} & \begin{tabular}[c]{@{}c@{}}Number of\\ Compartments\end{tabular} & \begin{tabular}[c]{@{}c@{}}Number of\\ Knapsacks\end{tabular} \\ \hline
+Instance 1 & 3487                                                          & 16                                                               & 52                                                            \\ \hline
+           &                                                               &                                                                  &                                                               \\ \hline
+           &                                                               &                                                                  &                                                               \\ \hline
+\end{tabular}
+
+\caption{Table Caption} % \label{fig1}
+\end{table}
+% \begin{table}[t]%% placement specifier
+% %% Use tabular environment to tag the tabular data.
+% %% https://en.wikibooks.org/wiki/LaTeX/Tables#The_tabular_environment
+% \centering%% For centre alignment of tabular.
+% \begin{tabular}{l c r}%% Table column specifiers
+% %% Tabular cells are separated by &
+%   1 & 2 & 3 \\ %% A tabular row ends with \\
+%   4 & 5 & 6 \\
+%   7 & 8 & 9 \\
+% \end{tabular}
+% %% Use \caption command for table caption and label.
+% \end{table}
+
+\subsection{Response to Inclusion}
+The response to the inclusion of a work order is given by P parameter of the model which 
+is constrained in \ref{eqn:inclusion_constraint} of model given in \ref{sub1sec2}.
+
+The inclusion is made of forcing certain allocations of item sets to be in specific knapsack. Below a table is provided 
+to show what changes will occur and at what and at what point in time.
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+\begin{tabular}[c]{@{}c@{}}\end{tabular}     & \begin{tabular}[c]{@{}c@{}}At Time:\\ 01:00\end{tabular} & \begin{tabular}[c]{@{}c@{}}At Time:\\ 02:00\end{tabular} & \begin{tabular}[c]{@{}c@{}}At Time:\\ 03:00\end{tabular} & \begin{tabular}[c]{@{}c@{}}At Time:\\ 04:00\end{tabular} & \begin{tabular}[c]{@{}c@{}}At Time:\\ 05:00\end{tabular} \\ \hline
+\begin{tabular}[c]{@{}c@{}}$\Delta |P|$\end{tabular} & 10                                                       & 20                                                       & 30                                                       & 40                                                       & 50                                                       \\ \hline
+\end{tabular}
+\end{table}
+
+With the inputs defined we will explain the main results which are shown in the figure below. 
+% Use figure environment to create figures
+% Refer following link for more details.
+% https://en.wikibooks.org/wiki/LaTeX/Floats,_Figures_and_Captions
+\begin{figure}[H]%% placement specifier
+%% Use \includegraphics command to insert graphic files. Place graphics files in 
+%% working directory.
+\centering%% For centre alignment of image.
+\includegraphics[width=1.0\textwidth]{../figures/objective.png}
+%% Use \caption command for figure caption and label.
+\caption{Figure Caption}\label{fig1}
+%% https://en.wikibooks.org/wiki/LaTeX/Importing_Graphics#Importing_external_graphics
+\end{figure}
+
+\subsection{Response to Changes in Knapsack Capacities}
+The effects of changes to capacities will be illustrated in the same way as it was with the response to inclusion and below we see the table that shows which inputs that the ALNS will be affected by.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+                      & \begin{tabular}[c]{@{}c@{}}At Time:\\ 01:00\end{tabular} & \begin{tabular}[c]{@{}c@{}}At Time:\\ 02:00\end{tabular} & \begin{tabular}[c]{@{}c@{}}At Time:\\ 03:00\end{tabular} & \begin{tabular}[c]{@{}c@{}}At Time:\\ 04:00\end{tabular} & \begin{tabular}[c]{@{}c@{}}At Time:\\ 05:00\end{tabular} \\ \hline
+$\Delta |k|$ & 16                                                       & 16                                                       & 16                                                       & 16                                                       & 16                                                       \\ \hline
+$\Delta |c|$ & 16                                                       & 16                                                       & 16                                                       & 16                                                       & 16                                                       \\ \hline
+$\Delta |cap|$& 100                                                      & 200                                                      & 400                                                      & 800                                                      & 1600                                                     \\ \hline
+\end{tabular}
+\end{table}
+
+\subsection{Response to Changes in Item Weights}
+The last parameter that will be changed in the item set wights. This section will be more elaborate as we have to show how that the item sets are rearranged due to the changes in their weights across the different periods.
+
+\begin{table}[H]
+\centering
+\begin{tabular}{|c|c|c|c|c|c|}
+\hline
+             & \begin{tabular}[c]{@{}c@{}}At Time:\\ 01:00\end{tabular} & \begin{tabular}[c]{@{}c@{}}At Time:\\ 02:00\end{tabular} & \begin{tabular}[c]{@{}c@{}}At Time:\\ 03:00\end{tabular} & \begin{tabular}[c]{@{}c@{}}At Time:\\ 04:00\end{tabular} & \begin{tabular}[c]{@{}c@{}}At Time:\\ 05:00\end{tabular} \\ \hline
+$\Delta |i|$ & 20                                                       & 40                                                       & 80                                                       & 160                                                      & 320                                                      \\ \hline
+$\Delta |k|$ & 26                                                       & 26                                                       & 26                                                       & 26                                                       & 26                                                       \\ \hline
+$\Delta |v|$ & $1 \cdot 10^{5}$                                         & $2 \cdot 10^{5}$                                         & $4 \cdot 10^{5}$                                         & $8 \cdot 10^{5}$                                         & $1.6 \cdot 10^{6}$                                       \\ \hline
+\end{tabular}
+\end{table}
 
 \section{Discussion}
-(MICROSERVICE SOURCE)
+There are multiple implications and new oppurtunities by adopting an approach to optimization as proposes by this paper. Some of these may not initially be completely obvious. In the discussion section we will go through the three 
+most conseqential ones: 1. continual optimization saves the initial time it takes to reach converence significantly, 2. due to the message system the optimization approach will always be responsive to changes in both the parameter space
+and the solution space, and 3. due to the strong encapsulation and message passing properties of the suggested optimization approach it becomes possible to apply the setup in multi-model and hierarchical model setups, providing an
+approach for modelling and optimizing large scale systems. Finally a suggestion for future resarch directions will be given.
+
+\subsection{Continuous Optimization}
+
+
+\subsection{Message Passing versus Restarts}
+\begin{itemize}
+	\item Dynamic
+	\item Resource efficient
+	\item Integration (microservice)  
+\end{itemize}
+
+\subsection{System Level Optimization}
+
+
+
+
+
+
 %% Use \subsubsection, \paragraph, \subparagraph commands to 
 %% start 3rd, 4th and 5th level sections.
 %% Refer following link for more details.
