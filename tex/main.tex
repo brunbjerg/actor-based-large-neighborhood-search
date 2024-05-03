@@ -150,36 +150,30 @@ Large Neighborhood Search \sep Actor Framework \sep Real-time Optimization \sep 
 
 %% Use \section commands to start a section
 \section{Introduction}
-\label{sec1}
+\label{sec:1-introduction}
 %% Labels are used to cross-reference an item using \ref command.
 
-Many problems that face the operation research field are hard to solve due to the need of tight integration tacit knowledge found in the minds of the 
-the decision makers that have to make decision based on solutions provided by operation research methods such as metaheuristics and models. 
-To solve operation research problems that are highly operational in nature there is a need for metaheuristics that are: 1.  
+Many problems in operation research are hard to solve due to the need of tight integration with tacit knowledge found in the minds of key decision makers 
+that have to make decisions based on solutions provided by operation research methods such as metaheuristics and commercial solvers. 
+To solve operation research problems that are highly operational in nature there three additional requirements for metaheuristics to have: 1.  
 responsive, 2. able to be assimilated into the decision makers workflow, and 3. allows for integration into dynamic data source such as traditional databases \citep{meignan_review_2015}. 
 Operational aspects of operation research, as opposed to strategic and tactical aspects, are often characterized by by extensive amounts negotiation and feedback on 
-proposed solutions to general operations research problems (!!!). This often lead to a situation
-where operation research methods are not used to solve the problem that their underlying model proposes to solve and instead provides intial suggestions 
-instead of a complete solution \cite{meignan_review_2015} . Operations are often
-characterized by extensive amounts negotiation and feedback on proposed "solutions" between relevant stakeholders. This often lead to a situation
-where operation research methods are not used to solve the problem that their underlying model proposes to solve and instead end up providing suggestions. 
+proposed solutions to general operations research problems (!!!). This can lead to a situation
+where operation research methods are not used to solve the problem of their underlying model and instead provides intial suggestions \cite{meignan_review_2015}. In practice
+operations are usually characterized by extensive negotiation and feedback on proposed "solutions" between relevant stakeholders.  
 
-This paper proposes a solution method that will allow for real-time optimization based on user-interaction (effectively altering the parameter space) and real-time 
-connection to data sources, such to a database connections. The proposed solution method will be based on the multi-compartment multi-knapsack problem on a large dataset. 
-Furthermore the large neighborhood search metaheuristic has been chosen due to its properties of being able to work with and fix infeasible solutions. 
+This paper proposes a solution method that will allow for real-time optimization based on user-interaction (changes to the parameter space) and connection to a dynamic 
+data source (in practice a database connection). The proposed solution method will be based on the multi-compartment multi-knapsack problem on a large dataset. 
+Further the large neighborhood search metaheuristic has been chosen due to its properties of being able to work with and fix infeasible solutions. 
 
-The paper is divided into four different sections. Section \ref{sec2} explains the model and method in detail that form the fundation of the paper. 
-Section \ref{sec3} shows that results coming from the implemented system where the system will be affected by simulated user-interaction. Section \ref{sec4} 
+The paper is divided into four different sections. Section \ref{sec:2-solution-method} explains the model and method in detail that form the fundation of the paper. 
+Section \ref{sec:3-results} shows that results coming from the implemented system where the system will be affected by simulated user-interaction. Section \ref{sec:4-discussion} 
 will discuss the implications of the research and possible future research directions.
-
-
-
-%% Use \subsection commands to start a subsection.
 
 \subsection{The Multi-compartment Multi-knapsack Problem with capacity penalties}
 \label{sub1sec2}
-Here a variant of the knapsack problem is chosen as the problem to apply actor-based large neighborhood search on. It has been chosen due to its simplicity
-while also being sufficiently computationally hard to be able to illustrate the rationale behind the solution approach. The model is comprised of 
+A variant of the knapsack problem is applied to the actor-based large neighborhood search. It was chosen due to its simplicity
+while also being sufficiently computationally hard to be able to illustrate the power behind the solution approach. The model is comprised of 
 five different sets. Here: $K$ is the number of knapsacks; $I$ is the number of items; $C$ is the number of compartments; $Q$ is a set that
 defines which items should be excluded from a specific knapsack; $P$ is an inclusion set that defines the items which should be included in each 
 knapsack. The model introduces four different parameters. Here: $v_{ik}$ is the value associated with item i in knapsack k; $d$ is the 
@@ -189,33 +183,33 @@ if item i is in knapsack k and zero otherwise; $p_{kc}$ is non-negative decision
 the $c_{kc}$ in knapsack k for compartment c. 
 
 \begin{alignat}{2}
-	& \text{Min} \quad \sum_{i = 1}^{I} \sum_{k = 1}^{K} v_{ik} \cdot x_{ik} - \sum_{k = 1}^{K} \sum_{c = 1}^C d \cdot p_{kc} \label{eqn:objective_function_strategic} \\[1em]
+	& \text{Min} \quad \sum_{i = 1}^{I} \sum_{k = 1}^{K} v_{ik} \cdot x_{ik} + \sum_{k = 1}^{K} \sum_{c = 1}^C d \cdot p_{kc}   \label{eqn:objective_function_strategic} \\[1em]
     & \text{subject to:} \notag                                                                                                                                        \\[1em]
-	& \sum_{i=1}^I w_{ic} \cdot x_{ik} \leq \ cap_{kc} + p_{kc}        && \forall k \in K, \forall c \in C                    \label{eqn:capacity_constraint}          \\[1em]
-	& \sum_{i = 1}^{I} x_{ik} \leq \ 1                               && \forall k \in K                                       \label{eqn:single_workorder_constraint}  \\[1em]
-	& x_{ik} = 0                                                     && \forall (i, k) \in Q                                  \label{eqn:exclusion_constraint}         \\[1em]
-	& x_{ik} = 1                                                     && \forall (i, k) \in P                                  \label{eqn:inclusion_constraint}         \\[1em]
-	& x_{ik} \in \{0, 1\}                                            && \forall i \in I, \forall k \in K                      \label{eqn:x_integrality_constraint}     \\[1em] 
-	& p_{kc} \in \mathbb{R}^{+}                                      && \forall k \in K, \forall c \in C                      \label{eqn:p_non_negativity_constraint}
+	& \sum_{i=1}^I w_{ic} \cdot x_{ik} \leq \ cap_{kc} + p_{kc}        && \forall k \in K, \forall c \in C                      \label{eqn:capacity_constraint}          \\[1em]
+	& \sum_{i = 1}^{I} x_{ik} = 1                                      && \forall k \in K                                       \label{eqn:single_workorder_constraint}  \\[1em]
+	& x_{ik} = 0                                                       && \forall (i, k) \in Q                                  \label{eqn:exclusion_constraint}         \\[1em]
+	& x_{ik} = 1                                                       && \forall (i, k) \in P                                  \label{eqn:inclusion_constraint}         \\[1em]
+	& x_{ik} \in \{0, 1\}                                              && \forall i \in I, \forall k \in K                      \label{eqn:x_integrality_constraint}     \\[1em] 
+	& p_{kc} \in \mathbb{R}^{+}                                        && \forall k \in K, \forall c \in C                      \label{eqn:p_non_negativity_constraint}
 \end{alignat}
 
-
-In this paper we will specifically look at the effects of changing Q, P, cap, and v in real-time and illustrate the effects that this approach has on the solution and the objective value.
+Here the objective function \ref{eqn:objective_function_strategic} aims to minimize the total weight of all item set assignments under a penalty $d$ given for exceeding the 
+capacity given by constraint \ref{eqn:capacity_constraint}. Constraint \ref{eqn:capacity_constraint} makes sure that all the weights $w_{ic}$ for each item in an item set, given that it
+has been assigned, is lower than the capacity for each knapsack k and for each compartment c. $p_{kc}$ is the amount of exceed capacity that is needed for the current assignment of item sets to be feasible.
+Constraint \ref{eqn:single_workorder_constraint} makes sure that each item set is assigned to atleast a single knapsack. Constraint \ref{eqn:exclusion_constraint} excludes item sets from 
+certain knapsacks and constraint \ref{eqn:inclusion_constraint}  forces a specific item set to be in a specific knapsack. Constraint \ref{eqn:x_integrality_constraint} and \ref{eqn:p_non_negativity_constraint} 
+specify the variable domain for $x_{ik}$ and $p_{kc}$ respectively. In this paper the effects of changing Q, P, cap, and v in real-time will be examined to determine their effects on the solution and objective value.
 
 \section{Solution Method}
-\label{sec2}
-
-\subsection{Large Neighborhood Search}
+\label{sec:2-solution-method}
 
 \subsection{Actor-based Large Neighborhood Search}
-
 A problem that is subject to user-interaction and requires real-time feedback you need an optimization approach that is able to repair infeasible solutions and while also 
 converging quickly. For this the large neighborhood search metaheuristic has been shown satisfy these requirements in the literature \cite{gendreau_handbook_2019}. 
 
-The LNS metaheuristic is in its most basic form implicitly defined for static problems meaning that the parameters that make up the problem instance is not subject to change 
-after the algorithm has been started. To make the LNS able adapt to incoming information in real-time a message system have been implemented on top of the existing framework.
-
-This extension is shown in algorithm \ref{algo1}.
+The LNS metaheuristic is in its most basic form is implicitly defined for static problems meaning that the parameters that make up the problem instance is not subject to change 
+after the algorithm has been started. To make the LNS able adapt to incoming information in real-time a message system have been implemented on top of the existing framework. This 
+extension is shown in algorithm \ref{algo1}. In the pseudocode the $x$ 
 
 \begin{algorithm}[H]
 \caption{Actor-based Large Neighborhood Search}  \label{algo1}
@@ -223,21 +217,22 @@ This extension is shown in algorithm \ref{algo1}.
 \State \textbf{Input} queue = message queue
 \State \textbf{Input} P     = problem instance
 \State \textbf{Input} x     = initial solution
-\State x$^b$ = x 
+\State $x^b = x$
 \While{true}
-	\If{!queue.is\_empty}
+	\While{queue.has\_message()}
         \State m = queue.pop()
-        \State x.update(m)
-        \State x$^b$.update(m)
+        \State $x$.update(m)
+        \State $x^b$.update(m)
+		
 		\State P.update(m)
-    \EndIf
+    \EndWhile
 	
-    \State x$^t$ = r(d(x))
-    \If{accept(x$^t$,\ x)}                       \label{alg:acceptance_criteria_start}
+    \State $x^t = r(d(x))$
+    \If{accept($x^t$,\ $x$)}                       \label{alg:acceptance_criteria_start}
         \State x = x$^t$
     \EndIf                                       \label{alg:acceptance_criteria_end}
-    \If{c(x$^t$) $<$ c(x$^b$)}                   \label{alg:objective_start}
-        \State $x^b = x^b$
+    \If{$c(x^t) < c(x^b)$}                   \label{alg:objective_start}
+        \State $x^b = x^t$
 		\State queue($x^b$)
     \EndIf                                       \label{alg:objective_end}
 \EndWhile
@@ -253,12 +248,11 @@ Another less obvious property the message queue allows is for the algorithm to r
 This property avoid the issue of time consuming initial convergence as the algorithm will be found in an optimimal state when the solution is perturbed.  
 
 \section{Results}
+\label{sec:3-results}
 This results section will 1. introduce the data instance 2. show the effect of forcing item set in the specific knapsacks 3. show the effect of changing the 
 knapsack capacities, and 4. show the effect of dynamically changing the item set weights. 
 
 \section{Data Instance}
-
-
 \begin{table}[t]
 \centering
 \begin{tabular}{|c|c|c|c|c|}
@@ -313,6 +307,19 @@ With the inputs defined we will explain the main results which are shown in the 
 %% https://en.wikibooks.org/wiki/LaTeX/Importing_Graphics#Importing_external_graphics
 \end{figure}
 
+
+\subsection{Response to Exclusion}
+\begin{figure}[H]%% placement specifier
+%% Use \includegraphics command to insert graphic files. Place graphics files in 
+%% working directory.
+\centering%% For centre alignment of image.
+\includegraphics[width=1.0\textwidth]{../figures/objective-400-exclusions.png}
+%% Use \caption command for figure caption and label.
+\caption{Figure Caption}\label{fig:objective-exclusion-400}
+%% https://en.wikibooks.org/wiki/LaTeX/Importing_Graphics#Importing_external_graphics
+\end{figure}
+
+
 \subsection{Response to Changes in Knapsack Capacities}
 The effects of changes to capacities will be illustrated in the same way as it was with the response to inclusion and below we see the table that shows which inputs that the ALNS will be affected by.
 
@@ -326,6 +333,18 @@ $\Delta |c|$ & 16                                                       & 16    
 $\Delta |cap|$& 100                                                      & 200                                                      & 400                                                      & 800                                                      & 1600                                                     \\ \hline
 \end{tabular}
 \end{table}
+
+\begin{figure}[H]%% placement specifier
+%% Use \includegraphics command to insert graphic files. Place graphics files in 
+%% working directory.
+\centering%% For centre alignment of image.
+\includegraphics[width=1.0\textwidth]{../figures/objective-resource-increases.png}
+%% Use \caption command for figure caption and label.
+\caption{Figure Caption}\label{fig:objective-resource-increases}
+%% https://en.wikibooks.org/wiki/LaTeX/Importing_Graphics#Importing_external_graphics
+\end{figure}
+
+Correspondingly we also have the figure below in which the resources are decreasing.
 
 \subsection{Response to Changes in Item Weights}
 The last parameter that will be changed in the item set wights. This section will be more elaborate as we have to show how that the item sets are rearranged due to the changes in their weights across the different periods.
@@ -342,6 +361,7 @@ $\Delta |v|$ & $1 \cdot 10^{5}$                                         & $2 \cd
 \end{table}
 
 \section{Discussion}
+\label{sec:4-discussion}
 There are multiple implications and new oppurtunities by adopting an approach to optimization as proposes by this paper. Some of these may not initially be completely obvious. In the discussion section we will go through the three 
 most conseqential ones: 1. continual optimization saves the initial time it takes to reach converence significantly, 2. due to the message system the optimization approach will always be responsive to changes in both the parameter space
 and the solution space, and 3. due to the strong encapsulation and message passing properties of the suggested optimization approach it becomes possible to apply the setup in multi-model and hierarchical model setups, providing an
