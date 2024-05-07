@@ -1,3 +1,3 @@
 #!/bin/bash
 
-ls tex/*.tex | entr -s "tectonic -o build tex/main.tex"
+ls **.tex | entr -s "tectonic -o build main.tex"
