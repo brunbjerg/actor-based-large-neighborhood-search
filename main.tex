@@ -382,6 +382,7 @@ $\Delta |v|$ & $1 \cdot 10^{5}$                                         & $2 \cd
 
 \section{Discussion}
 \label{sec:4-discussion}
+\subsection{Integration}
 Figure \ref{fig:normal-setup}illustrates
 a classic approach to operations research where a model allows the decision maker 
 the obtain a solution to from which to make better informed decision. This approach is suitable to static problems and
@@ -424,17 +425,15 @@ approach for modelling and optimizing large scale systems. Finally a suggestion 
 \subsection{Continuous Optimization}
 By continually optimizing it becomes possible to only optimize the pertubations to the schedule. This means that we avoid having to optimize the problem to reach initial convergence.
 
-In many cases this can save a significant amount of computations, especially if specilized constructors and destructors are implemented to handle the specific pertubations.
+In many cases this can save a significant amount of computations, refer to \cite{alza_bartlett_ceberio_mccall_2023}, especially if specilized constructors and destructors are implemented to handle the specific pertubations.
 
 \subsection{Message Passing versus Restarts}
-In software development when implementing parallel or concurrent programs there is a move towards message passing instead of shared memory.   
-\begin{itemize}
-	\item Dynamic
-	\item Resource efficient
-	\item Integration (microservice)  
-\end{itemize}
-\subsection{System Level Optimization}
+There is evidence that the effect of dynamic optimization is not always efficient, \cite{alza_bartlett_ceberio_mccall_2023} mentions the idea that dynamic optimization approaches can be "elusive" in that they do not always provide a speedup over restarting the solution method implementation. 
+The paper clearly shows that dynamic approaches are the most effective when changes are small and frequent, which does align with the idea behind the actor-based LNS in that changes should be optimized around when ever they occur. T   
 
+
+\subsection{System Level Optimization}
+This approach could also enable larger scale optimzations providing a modular approach to operations research. This is beneficial ... 21
 
 
 
