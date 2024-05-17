@@ -100,19 +100,40 @@
 %%             country={}}
 
 \author{Christian Brunbjerg Jespersen} %% Author name
+\author{Thomas Jacob Riis Stidsen}
+\author{Kristoffer Sigsgaard Wernblad}
 
 %% Author affiliation
-\affiliation{organization={},%Department and Organization
-            addressline={}, 
-            city={},
-            postcode={}, 
-            state={},
-            country={}}
+\affiliation{organization={Technical University of Denmark},%Department and Organization
+            addressline={Anker Egelundsvej 1}, 
+            city={Kongens Lyngby},
+            postcode={2800}, 
+            state={Hovedstaden},
+            country={Denmark}}
+\affiliation{organization={Technical University of Denmark},%Department and Organization
+            addressline={Anker Egelundsvej 1}, 
+            city={Kongens Lyngby},
+            postcode={2800}, 
+            state={Hovedstaden},
+            country={Denmark}}
+\affiliation{organization={Technical University of Denmark},%Department and Organization
+            addressline={Anker Egelundsvej 1}, 
+            city={Kongens Lyngby},
+            postcode={2800}, 
+            state={Hovedstaden},
+            country={Denmark}}
 
 %% Abstract
 \begin{abstract}
 %% Text of abstract
-Abstract text.
+Serveral problems facing the operations research field have proven difficult to solve due to their inherrent uncertainty
+and highly dynamic nature. Stochastic optimization, fuzzy logic, and robust optimization are some of the methods that 
+have been proposed to solve these issues. These methods make an implicit assumption on static data and
+a static problem setting. This paper will argue that a new class of optimization methods will have to be developed by
+reflect the need optimizing in a settings where: the data source is changing in real-time; where external inputs affects
+the optimization process; where multiple actors are making interdependent decision whose objectives may differ significantly.
+This paper proposes an actor-based implementation of the classic large neighborhood search metaheuristic as a specific 
+contribution to optimization approachs that more naturally model the dynamic nature of many operational problems.
 \end{abstract}
 
 %%Graphical abstract
@@ -129,7 +150,7 @@ Abstract text.
 %% Keywords
 \begin{keyword}
 %% keywords here, in the form: keyword \sep keyword
-Large Neighborhood Search \sep Actor Framework \sep Real-time Optimization \sep human-centered computing \sep Interactive Systems and Tools \sep Decision Support Systems \sep Interactive Optimization
+Large Neighborhood Search \sep Actor Framework \sep Real-time Optimization \sep Human-centered Computing \sep Interactive Systems and Tools \sep Decision Support Systems \sep Interactive Optimization.
 
 
 %% PACS codes here, in the form: \PACS code \sep code
@@ -153,19 +174,20 @@ Large Neighborhood Search \sep Actor Framework \sep Real-time Optimization \sep 
 \label{sec:1-introduction}
 %% Labels are used to cross-reference an item using \ref command.
 
+Dynamic and operational problems have proven hard to solve in operation research (!!!) due to the need of tight integration with tacit knowledge of key decision makers.
+Solving operation research problems that are highly operational in nature have three additional requirements over conventional static solution approaches: they have to be very responsive; 
+able to be assimilated into the decision makers workflow; allow for integration into dynamic data source such as databases \citep{meignan_review_2015}. 
+Operational aspects of operation research, as opposed to strategic and tactical aspects, are characterized by extensive amounts negotiation and feedback on 
+proposed solutions (!!!). This can lead to solutions that are not directly implemented in practice but instead provides intial suggestions \cite{meignan_review_2015}. 
+Operations are usually characterized by extensive negotiation and feedback on proposed "solutions" between relevant stakeholders. Many large models found in the
+operations research literature become "multi-objective" as they model multiple actors of a decision process in a single model.
 
-Many problems in operation research are hard to solve due to the need of tight integration with tacit knowledge found in the minds of key decision makers 
-that have to make decisions based on solutions provided by operation research methods such as metaheuristics and commercial solvers. 
-To solve operation research problems that are highly operational in nature there three additional requirements for metaheuristics to have: 1.  
-responsive, 2. able to be assimilated into the decision makers workflow, and 3. allows for integration into dynamic data source such as traditional databases \citep{meignan_review_2015}. 
-Operational aspects of operation research, as opposed to strategic and tactical aspects, are often characterized by by extensive amounts negotiation and feedback on 
-proposed solutions to general operations research problems (!!!). This can lead to a situation
-where operation research methods are not used to solve the problem of their underlying model and instead provides intial suggestions \cite{meignan_review_2015}. In practice
-operations are usually characterized by extensive negotiation and feedback on proposed "solutions" between relevant stakeholders.  
+Often multi-objective optimization is a product of there being multiple decision makers with different views on an optimal solution.
 
 This paper proposes a solution method that will allow for real-time optimization based on user-interaction (changes to the parameter space) and connection to a dynamic 
-data source (in practice a database connection). The proposed solution method will be based on the multi-compartment multi-knapsack problem on a large dataset. 
-Further the large neighborhood search metaheuristic has been chosen due to its properties of being able to work with and fix infeasible solutions. 
+data source (in practice this could be a database connection). The proposed solution method will be tested on the multi-compartment multi-knapsack problem (MCMKP) on a large dataset. 
+The large neighborhood search metaheuristic has been chosen due to its properties of naturally being able to work with and fix infeasible solutions and its state of the 
+art performance. 
 
 The paper is divided into four different sections. Section \ref{sec:2-solution-method} explains the model and method in detail that form the fundation of the paper. 
 Section \ref{sec:3-results} shows that results coming from the implemented system where the system will be affected by simulated user-interaction. Section \ref{sec:4-discussion} 
@@ -173,13 +195,13 @@ will discuss the implications of the research and possible future research direc
 
 \subsection{The Multi-compartment Multi-knapsack Problem with capacity penalties}
 \label{sub1sec2}
-A variant of the knapsack problem is applied to the actor-based large neighborhood search. It was chosen due to its simplicity
-while also being sufficiently computationally hard to be able to illustrate the power behind the solution approach. The model is comprised of 
-five different sets. Here: $K$ is the number of knapsacks; $I$ is the number of items; $C$ is the number of compartments; $Q$ is a set that
-defines which items should be excluded from a specific knapsack; $P$ is an inclusion set that defines the items which should be included in each 
-knapsack. The model introduces four different parameters. Here: $v_{ik}$ is the value associated with item i in knapsack k; $d$ is the 
-penalty paid for exceeding the compartment capacity; $w_{ic}$ is the capacity requirement for item i in compartment c; $cap_{kc}$ is the total amount 
-of capacity available in knapsack k for compartment c. The decision-variables are: $x_{ik}$, which is a binary decision variable equal to one 
+The actor-based large neighborhood search is implemented on the MCMKP. The MCMKP was chosen due to its simplicity
+while also being sufficiently computationally hard to illustrate the principle behind the Actor-based LNS. The model is comprised of 
+five different sets. $K$ is the number of knapsacks; $I$ is the number of items; $C$ is the number of compartments; $Q$ is a set that
+defines which items should be excluded from a specific knapsack; $P$ is an inclusion set that defines the allocation of specific item sets 
+which should be included in a specific knapsack. The model has four parameters. $v_{ik}$ is the value of item i in knapsack k; $d$ is the 
+penalty for exceeding compartment capacity; $w_{ic}$ is the capacity requirement for item i in compartment c; $cap_{kc}$ is the total amount 
+of capacity available in knapsack k for compartment c. The model has 2 decision variables. $x_{ik}$, is a binary decision variable equal to one 
 if item i is in knapsack k and zero otherwise; $p_{kc}$ is non-negative decision variable equal to the amount of excess capacity above 
 the $c_{kc}$ in knapsack k for compartment c. 
 
@@ -194,12 +216,12 @@ the $c_{kc}$ in knapsack k for compartment c.
 	& p_{kc} \in \mathbb{R}^{+}                                        && \forall k \in K, \forall c \in C                      \label{eqn:p_non_negativity_constraint}
 \end{alignat}
 
-Here the objective function \ref{eqn:objective_function_strategic} aims to minimize the total weight of all item set assignments under a penalty $d$ given for exceeding the 
-capacity given by constraint \ref{eqn:capacity_constraint}. Constraint \ref{eqn:capacity_constraint} makes sure that all the weights $w_{ic}$ for each item in an item set, given that it
-has been assigned, is lower than the capacity for each knapsack k and for each compartment c. $p_{kc}$ is the amount of exceed capacity that is needed for the current assignment of item sets to be feasible.
+The objective function \ref{eqn:objective_function_strategic} minimizes the total weight of all item set assignments together with the penalty $d$ for exceeding the 
+capacity given in constraint \ref{eqn:capacity_constraint}. Constraint \ref{eqn:capacity_constraint} ensures that all the weights $w_{ic}$ for each item in an item set, given that it
+has been assigned, is lower than the capacity for each knapsack k and for each compartment $c$. $p_{kc}$ is the amount of exceeded capacity that is needed for the current assignment of item sets to be feasible.
 Constraint \ref{eqn:single_workorder_constraint} makes sure that each item set is assigned to atleast a single knapsack. Constraint \ref{eqn:exclusion_constraint} excludes item sets from 
 certain knapsacks and constraint \ref{eqn:inclusion_constraint}  forces a specific item set to be in a specific knapsack. Constraint \ref{eqn:x_integrality_constraint} and \ref{eqn:p_non_negativity_constraint} 
-specify the variable domain for $x_{ik}$ and $p_{kc}$ respectively. In this paper the effects of changing Q, P, cap, and v in real-time will be examined to determine their effects on the solution and objective value.
+specify the variable domain for $x_{ik}$ and $p_{kc}$ respectively. The effects of changing $Q$, $P$, $cap$, and $v$ in real-time will be examined to determine their effects on the solution and objective value.
 
 \section{Solution Method}
 \label{sec:2-solution-method}
@@ -360,10 +382,16 @@ $\Delta |v|$ & $1 \cdot 10^{5}$                                         & $2 \cd
 
 \section{Discussion}
 \label{sec:4-discussion}
-The key novelty in adopting actor-based large neighborhood search is that it enables tight integration with either users, dynamic data sources, and other models. In figure \ref{fig:normal-setup} we 
-see a normal use case of optimization approaches where the user extracts data out from a source which is then supplied to a dedicated optimization algorithm. If an algorithm in this setup is not 
-built to support real-time connectivity only one user will be allowed to use the algorithm at a time for a given set of data. In certain settings, and especially in highly operational ones, this setup can 
-become unworkable, due to many things changing continuously.
+Figure \ref{fig:normal-setup}illustrates
+a classic approach to operations research where a model allows the decision maker 
+the obtain a solution to from which to make better informed decision. This approach is suitable to static problems and
+problems there the parameters that make up the problem change slowly. This approach is often unsatisfactory in environments where
+the environment is ever changing and the model parameters continually change in that light of new information. To solve this
+problem a new field of dynamic and interactive metaheuristics show promise. 
+
+Actor-based large neighborhood search enables tight integration between both the users and a 
+dynamic data sources but crucially it naturally allows models to communicate with each other mimicking most 
+practical decisions which are made up of multiple actors. For example, maintenance scheduling problems.
 
 \begin{figure}[H]%% placement specifier
 %% Use \includegraphics command to insert graphic files. Place graphics files in 
@@ -405,7 +433,6 @@ In software development when implementing parallel or concurrent programs there 
 	\item Resource efficient
 	\item Integration (microservice)  
 \end{itemize}
-
 \subsection{System Level Optimization}
 
 
