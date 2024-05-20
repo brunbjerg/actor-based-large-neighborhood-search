@@ -203,15 +203,16 @@ which should be included in a specific knapsack. The model has four parameters. 
 penalty for exceeding compartment capacity; $w_{ic}$ is the capacity requirement for item i in compartment c; $cap_{kc}$ is the total amount 
 of capacity available in knapsack k for compartment c. The model has 2 decision variables. $x_{ik}$, is a binary decision variable equal to one 
 if item i is in knapsack k and zero otherwise; $p_{kc}$ is non-negative decision variable equal to the amount of excess capacity above 
-the $c_{kc}$ in knapsack k for compartment c. 
+the $c_{kc}$ in knapsack k for compartment c. The parameters $v$, $cap$, $Q$, and $P$ are functions of time, $t$, in this case as they will be 
+subject to change during the solution process.
 
 \begin{alignat}{2}
-	& \text{Min} \quad \sum_{i = 1}^{I} \sum_{k = 1}^{K} v_{ik} \cdot x_{ik} + \sum_{k = 1}^{K} \sum_{c = 1}^C d \cdot p_{kc}   \label{eqn:objective_function_strategic} \\[1em]
+	& \text{Min} \quad \sum_{i = 1}^{I} \sum_{k = 1}^{K} v_{ik}(t) \cdot x_{ik} + \sum_{k = 1}^{K} \sum_{c = 1}^C d \cdot p_{kc}   \label{eqn:objective_function_strategic} \\[1em]
     & \text{subject to:} \notag                                                                                                                                        \\[1em]
-	& \sum_{i=1}^I w_{ic} \cdot x_{ik} \leq \ cap_{kc} + p_{kc}        && \forall k \in K, \forall c \in C                      \label{eqn:capacity_constraint}          \\[1em]
+	& \sum_{i=1}^I w_{ic} \cdot x_{ik} \leq \ cap_{kc}(t) + p_{kc}        && \forall k \in K, \forall c \in C                      \label{eqn:capacity_constraint}          \\[1em]
 	& \sum_{i = 1}^{I} x_{ik} = 1                                      && \forall k \in K                                       \label{eqn:single_workorder_constraint}  \\[1em]
-	& x_{ik} = 0                                                       && \forall (i, k) \in Q                                  \label{eqn:exclusion_constraint}         \\[1em]
-	& x_{ik} = 1                                                       && \forall (i, k) \in P                                  \label{eqn:inclusion_constraint}         \\[1em]
+	& x_{ik} = 0                                                       && \forall (i, k) \in Q(t)                                  \label{eqn:exclusion_constraint}         \\[1em]
+	& x_{ik} = 1                                                       && \forall (i, k) \in P(t)                                  \label{eqn:inclusion_constraint}         \\[1em]
 	& x_{ik} \in \{0, 1\}                                              && \forall i \in I, \forall k \in K                      \label{eqn:x_integrality_constraint}     \\[1em] 
 	& p_{kc} \in \mathbb{R}^{+}                                        && \forall k \in K, \forall c \in C                      \label{eqn:p_non_negativity_constraint}
 \end{alignat}
@@ -433,7 +434,7 @@ The paper clearly shows that dynamic approaches are the most effective when chan
 
 
 \subsection{System Level Optimization}
-This approach could also enable larger scale optimzations providing a modular approach to operations research. This is beneficial ... 21
+This approach could also enable larger scale optimzations providing a modular approach to operations research. This is beneficial 
 
 
 
