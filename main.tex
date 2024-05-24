@@ -1,4 +1,4 @@
-            %% 
+           %% 
  %% Copyright 2007-2024 Elsevier Ltd
 %% 
 %% This file is part of the 'Elsarticle Bundle'.
@@ -246,11 +246,11 @@ extension is shown in algorithm \ref{algo1}. In the pseudocode the $x$
 	\While{queue.has\_message()}
         % \State $m = queue.pop()$
         % \State $m.destruct(x^b)$
-		\State $m.update(P)$
-        \State $m.destruct(x)$
+		\State $P.update(m)$
+        \State $x.destruct(m)$
     \EndWhile
 	
-    \State $x^t = repair(x)$
+    \State $x^t = x.repair()$
     % \If{accept($x^t$,\ $x$)}                       \label{alg:acceptance_criteria_start}
     %     \State x = x$^t$
     % \EndIf                                       \label{alg:acceptance_criteria_end}
@@ -282,8 +282,6 @@ knapsack capacities, and 4. show the effect of dynamically changing the item set
 \hline
            & \begin{tabular}[c]{@{}c@{}}Number of\\ Item Sets\end{tabular} & \begin{tabular}[c]{@{}c@{}}Number of\\ Compartments\end{tabular} & \begin{tabular}[c]{@{}c@{}}Number of\\ Knapsacks\end{tabular} \\ \hline
 Instance 1 & 3487                                                          & 16                                                               & 52                                                            \\ \hline
-           &                                                               &                                                                  &                                                               \\ \hline
-           &                                                               &                                                                  &                                                               \\ \hline
 \end{tabular}
 
 \caption{Table Caption} % \label{fig1}
@@ -368,7 +366,7 @@ $\Delta |cap|$& 100                                                      & 200  
 Correspondingly we also have the figure below in which the resources are decreasing.
 
 \subsection{Response to Changes in Item Weights}
-The last parameter that will be changed in the item set wights. This section will be more elaborate as we have to show how that the item sets are rearranged due to the changes in their weights across the different periods.
+The final parameter that will be changed is the item set weights. This section will be more elaborate as we have to show how that the item sets are rearranged due to the changes in their weights across the different periods.
 
 \begin{table}[H]
 \centering
