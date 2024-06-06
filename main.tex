@@ -16,7 +16,7 @@
 %% Template article for Elsevier's document class `elsarticle'
 %% with harvard style bibliographic references
 
- \documentclass[preprint,12pt,authoryear]{elsarticle}
+\documentclass[preprint,12pt,authoryear]{elsarticle}
 
 %% Use the option review to obtain double line spacing
 %% \documentclass[authoryear,preprint,review,12pt]{elsarticle}
@@ -174,20 +174,19 @@ Large Neighborhood Search \sep Actor Framework \sep Real-time Optimization \sep 
 \label{sec:1-introduction}
 %% Labels are used to cross-reference an item using \ref command.
 
-Dynamic and operational problems have proven hard to solve in operation research due to the need of tight integration with tacit knowledge of decision makers(!!!) .
-Solving operation research problems that are highly operational in nature have three additional requirements over conventional static solution approaches: they have to be very responsive; 
-able to be assimilated into the decision makers workflow; allow for integration into dynamic data source such as databases \citep{meignan_review_2015}. 
-Operational aspects of operation research, as opposed to strategic and tactical aspects, are characterized by extensive amounts negotiation and feedback on 
-proposed solutions (!!!). This can lead to solutions that are not directly implemented in practice but instead provides intial suggestions \cite{meignan_review_2015}. 
-Operations are usually characterized by extensive negotiation and feedback on proposed "solutions" between relevant stakeholders. Many large models found in the
-operations research literature become "multi-objective" as they model multiple actors of a decision process in a single model.
+Dynamic and operational problems have proven hard to solve in operation research due to the need of tight integration with tacit knowledge of decision makers, as clearly demonstrated by (\citep{barthelemy_human_2002}).
+Solving operation research problems that are highly operational in nature have three additional requirements over conventional static solution approaches: they have to be responsive to changing parameters; 
+able to be assimilated into the decision makers workflow; allow for integration with dynamic data sources such as databases and RESTapi \citep{meignan_review_2015}. 
+Operational aspects of operation research, as opposed to higher level strategic and tactical aspects, are characterized by extensive amounts negotiation and feedback on 
+proposed solutions (!!!). The lack of integration and responsiveness can lead to solutions that are not directly implemented in practice but instead provides intial suggestions \cite{meignan_review_2015}, which are
+then iterated on later manually. In \citep{barthelemy_human_2002} the authors argue that many problems that operation research aim to solve often in reality comprised of group of individual whose decisions are 
+aggregated into an "epistemic subject" on which a mathematical model to proposed and solved, with the VRP being one example. Furthermore some multi-objective optimization problems are a product of 
+there being multiple actors in the decision making process each with different views on an optimal solution from their vantage point.
 
-Often multi-objective optimization is a product of there being multiple decision makers with different views on an optimal solution.
-
-This paper proposes a solution method that will allow for real-time optimization based on user-interaction (changes to the parameter space) and connection to a dynamic 
-data source (in practice this could be a database connection). The proposed solution method will be tested on the multi-compartment multi-knapsack problem (MCMKP) on a large dataset. 
+This paper proposes a solution method that will allow for real-time optimization based on user-interaction and connection to a dynamic 
+data source (changes to the parameter space). The proposed solution method will be tested on the multi-compartment multi-knapsack problem (MCMKP) on a large dataset. 
 The large neighborhood search metaheuristic has been chosen due to its properties of naturally being able to work with and fix infeasible solutions and its state of the 
-art performance. 
+art performance on scheduling and routing problems. 
 
 The paper is divided into four different sections. Section \ref{sec:2-solution-method} explains the model and method in detail that form the fundation of the paper. 
 Section \ref{sec:3-results} shows that results coming from the implemented system where the system will be affected by simulated user-interaction. Section \ref{sec:4-discussion} 
@@ -207,14 +206,14 @@ the $c_{kc}$ in knapsack k for compartment c. The parameters $v$, $cap$, $Q$, an
 subject to change during the solution process.
 
 \begin{alignat}{2}
-	& \text{Min} \quad \sum_{i = 1}^{I} \sum_{k = 1}^{K} v_{ik}(t) \cdot x_{ik} + \sum_{k = 1}^{K} \sum_{c = 1}^C d \cdot p_{kc}   \label{eqn:objective_function_strategic} \\[1em]
+	& \text{Min} \quad \sum_{i = 1}^{I} \sum_{k = 1}^{K} v_{ik}(t) \cdot x_{ik}(t) + \sum_{k = 1}^{K} \sum_{c = 1}^C d \cdot p_{kc}(t)   \label{eqn:objective_function_strategic} \\[1em]
     & \text{subject to:} \notag                                                                                                                                        \\[1em]
-	& \sum_{i=1}^I w_{ic} \cdot x_{ik} \leq \ cap_{kc}(t) + p_{kc}        && \forall k \in K, \forall c \in C                      \label{eqn:capacity_constraint}          \\[1em]
-	& \sum_{i = 1}^{I} x_{ik} = 1                                      && \forall k \in K                                       \label{eqn:single_workorder_constraint}  \\[1em]
-	& x_{ik} = 0                                                       && \forall (i, k) \in Q(t)                                  \label{eqn:exclusion_constraint}         \\[1em]
-	& x_{ik} = 1                                                       && \forall (i, k) \in P(t)                                  \label{eqn:inclusion_constraint}         \\[1em]
-	& x_{ik} \in \{0, 1\}                                              && \forall i \in I, \forall k \in K                      \label{eqn:x_integrality_constraint}     \\[1em] 
-	& p_{kc} \in \mathbb{R}^{+}                                        && \forall k \in K, \forall c \in C                      \label{eqn:p_non_negativity_constraint}
+	& \sum_{i=1}^I w_{ic} \cdot x_{ik}(t) \leq \ cap_{kc}(t) + p_{kc}(t)        && \forall k \in K, \forall c \in C                      \label{eqn:capacity_constraint}          \\[1em]
+	& \sum_{i = 1}^{I} x_{ik}(t) = 1                                            && \forall k \in K                                       \label{eqn:single_workorder_constraint}  \\[1em]
+	& x_{ik}(t) = 0                                                             && \forall (i, k) \in Q(t)                               \label{eqn:exclusion_constraint}         \\[1em]
+	& x_{ik}(t) = 1                                                             && \forall (i, k) \in P(t)                               \label{eqn:inclusion_constraint}         \\[1em]
+	& x_{ik}(t) \in \{0, 1\}                                                    && \forall i \in I, \forall k \in K                      \label{eqn:x_integrality_constraint}     \\[1em] 
+	& p_{kc}(t) \in \mathbb{R}^{+}                                              && \forall k \in K, \forall c \in C                      \label{eqn:p_non_negativity_constraint}
 \end{alignat}
 
 The objective function \ref{eqn:objective_function_strategic} minimizes the total weight of all item set assignments together with the penalty $d$ for exceeding the 
@@ -231,9 +230,31 @@ specify the variable domain for $x_{ik}$ and $p_{kc}$ respectively. The effects 
 A problem that is affected by user-interaction and requires real-time feedback you need an optimization approach that is able to repair infeasible solutions and while also 
 converging quickly. For this the large neighborhood search metaheuristic has been shown satisfy these requirements in the literature \cite{gendreau_handbook_2019}. 
 
-The LNS metaheuristic is in its most basic form is defined for static problems, meaning that the parameters that make up the problem instance is not subject to change 
-after the algorithm has been started. To make the LNS able adapt to incoming information in real-time a message system have been implemented on top of the existing framework. This 
+The LNS metaheuristic is defined for static problems, meaning that the parameters that make up the problem instance is not subject to change 
+after the algorithm has been started. To make the LNS able adapt to changing parameters in real-time a message system have been implemented on top of the existing framework. This 
 extension is shown in algorithm \ref{algo1}. In the pseudocode the $x$ 
+
+\subsubsection{Messages And Destructors}
+LNS in its most basic form has one constructor and one destructor which repeatedly destroy and rebuild the solution. For the AbLNS we will generalize on this concept by 
+including messages as destructors of the classic LNS implementation. This generalization can be seen as being somewhat similar to how the adaptive LNS (ALNS) is formulated. 
+
+Extending on the classic setup we define the following destructors:
+
+\begin{itemize}
+	\item $m_1$: Inclusion destruct message	
+	\item $m_2$: Exclusion destruct message	
+	\item $m_3$: Capacities destruct message	
+	\item $m_4$: Weights destruct message	
+	\item $m_5$: Random destruct message
+\end{itemize}
+
+Each of these messages affect different parts of the MCMK problem. Notice
+here that the first four messages destruct the solution by changing the parameter space and the last message is 
+a random destructor.
+
+Generalizing the destructors from being static structures into messages
+allows the solution to change in real-time to a changing paramenter space meaning
+that the algorithm does not need to restart to handle changes in data. 
 
 \begin{algorithm}[H]
 \caption{Actor-based Large Neighborhood Search}  \label{algo1}
@@ -253,16 +274,17 @@ extension is shown in algorithm \ref{algo1}. In the pseudocode the $x$
     \State $x^t = x.repair()$
     % \If{accept($x^t$,\ $x$)}                       \label{alg:acceptance_criteria_start}
     %     \State x = x$^t$
-    % \EndIf                                       \label{alg:acceptance_criteria_end}
-    \If{$c(x^t) < c(x)$}                   \label{alg:objective_start}
+    % \EndIf                                         \label{alg:acceptance_criteria_end}
+    \If{$c(x^t) < c(x)$}                             \label{alg:objective_start}
         \State $x = x^t$
 		\State queue.send($x$)
-    \EndIf                                       \label{alg:objective_end}
-	\State queue.push(m)
+    \EndIf                                           \label{alg:objective_end}
+	\State queue.push($m_5$)
 \EndWhile\\
 \Return $x^b$
 \end{algorithmic}
 \end{algorithm}
+
 The basic LNS setup have here been extended with a `message queue`. This message queue will be read from on every iteration of the LNSs main iteration loop. Here we notice that the 
 incoming message are able to change both the solutoin but also the problem instance itself. Here we see one of the defining features of the LNS metaheuristic in play, that due to its inherrent 
 property of being able to optimize a solution that have become infeasible which is something that is very likely to happen when you change the parameter of the problem instance itself. 
