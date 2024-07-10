@@ -174,19 +174,20 @@ Large Neighborhood Search \sep Actor Framework \sep Real-time Optimization \sep 
 \label{sec:1-introduction}
 %% Labels are used to cross-reference an item using \ref command.
 
-Dynamic and operational problems have proven hard to solve in operation research due to the need of tight integration with tacit knowledge of decision makers, as clearly demonstrated by (\citep{barthelemy_human_2002}).
-Solving operation research problems that are highly operational in nature have three additional requirements over conventional static solution approaches: they have to be responsive to changing parameters; 
-able to be assimilated into the decision makers workflow; allow for integration with dynamic data sources such as databases and RESTapi \citep{meignan_review_2015}. 
+Dynamic and operational problems have proven hard to solve in operation research due to the need of tight integration with tacit knowledge of decision makers and the way that industry usually assigns responsibility for decision-making 
+to an individual representing only a small part of the complete process. These many smaller parts are often difficult to map to a single mathematical model describing the whole system as elaborated by (\citep{barthelemy_human_2002}).
+Solving operation research problems that are highly operational in nature have additional requirements over conventional static solution approaches: they have to be responsive to changing parameters; 
+able to be assimilated into the decision-makers workflow; allow for integration with dynamic data sources such as databases and RESTapi \citep{meignan_review_2015}. 
 Operational aspects of operation research, as opposed to higher level strategic and tactical aspects, are characterized by extensive amounts negotiation and feedback on 
-proposed solutions (!!!). The lack of integration and responsiveness can lead to solutions that are not directly implemented in practice but instead provides intial suggestions \cite{meignan_review_2015}, which are
-then iterated on later manually. In \citep{barthelemy_human_2002} the authors argue that many problems that operation research aim to solve often in reality comprised of group of individual whose decisions are 
-aggregated into an "epistemic subject" on which a mathematical model to proposed and solved, with the VRP being one example. Furthermore some multi-objective optimization problems are a product of 
-there being multiple actors in the decision making process each with different views on an optimal solution from their vantage point.
+proposed solutions. The lack of integration and responsiveness can lead to solutions that are not directly implemented in practice but instead provides intial suggestions \cite{meignan_review_2015}, which are
+then iterated on later manually. In \citep{barthelemy_human_2002} the authors argue that many problems that operation research aim to solve are often composed of a group of individuals whose decisions are 
+consolidated into an "epistemic subject" for which a mathematical model can be formulated and solved, with many scheduling problems being good examples. Furthermore some multi-objective optimization problems are a product of 
+there being multiple actors in the decision making process each with different views on an optimal solution from their vantage point rather then there being actual multi-objective for an individual actor.
 
-This paper proposes a solution method that will allow for real-time optimization based on user-interaction and connection to a dynamic 
-data source (changes to the parameter space). The proposed solution method will be tested on the multi-compartment multi-knapsack problem (MCMKP) on a large dataset. 
-The large neighborhood search metaheuristic has been chosen due to its properties of naturally being able to work with and fix infeasible solutions and its state of the 
-art performance on scheduling and routing problems. 
+This paper proposes a solution method that will allow for real-time optimization based on actor/user interaction and connection to a dynamic 
+data source, effectively meaning changes to the parameter space. The proposed solution method will be tested on the multi-compartment multi-knapsack problem (MCMKP) on a large dataset. 
+The solution method will by based on the large neighborhood search (LNS) metaheuristic. This meta heuristic was chosen due to its properties of naturally being able to work with and fix 
+infeasible solutions and its state of the art performance on various scheduling problems. 
 
 The paper is divided into four different sections. Section \ref{sec:2-solution-method} explains the model and method in detail that form the fundation of the paper. 
 Section \ref{sec:3-results} shows that results coming from the implemented system where the system will be affected by simulated user-interaction. Section \ref{sec:4-discussion} 
