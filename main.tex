@@ -153,36 +153,27 @@
 %% Abstract
 \begin{abstract}
 %% Text of abstract
-Serveral problems facing the operations research field have proven difficult to solve due to their inherrent uncertainty
-and highly dynamic nature. Stochastic optimization, fuzzy logic, and robust optimization are some of the methods that 
-have been proposed to solve these issues. These methods make an implicit assumption on static data and
-a static problem setting. Maintenance scheduling is one such problem where the best available information continually 
-updates and then therefore the scheduling continuously needs to be updated. Maintenance scheduling is a complex process and 
-it correct implementation is usually more associated with operation management, but this paper will argue that is possible 
-to implement general maintenance scheduling approaches if the solution method is designed to be integrated into a business
+Many planning problems facing the operations research field have proven difficult to solve due to their inherent uncertainty and highly dynamic nature. Stochastic optimization~\citep{???}, fuzzy logic~\citep{???}, and robust optimization~\citep{???} are some of the methods that have been proposed to solve these issues. These methods make an implicit assumption of a static data setting and a static problem setting. Maintenance scheduling is one such problem where the best available information continually updates and then therefore the scheduling continuously needs to be updated. Maintenance scheduling is a complex process often more associated with operation management, but here we will argue that is possible to implement general maintenance scheduling approaches, if the solution approach is designed to be integrated into a business
 process of the kind that are usually developed by the principles of operation management. 
 
-This paper proposes a novel optimization method that is capable to optimizing a scheduling problem in the following setting: 
-primary data source is changing in real-time; external inputs affects the optimization process; multiple actors
-are making interdependent decision whose objectives may differ significantly. The proposed solution approach is an actor-based implementation
-of the large neighborhood search metaheuristic and the paper will show that this approach can naturally model the dynamic nature of operational problems.
+This paper proposes a novel optimization method that is capable to optimizing a scheduling problem in the following setting:  Primary data source is changing in real-time; external inputs affects the optimization process; multiple actors are making interdependent decision whose objectives may differ significantly. The proposed solution approach is an actor-based framework including a large neighborhood search metaheuristic implementation. The framework is tested on the real-world problem of maintaining scheduling of oil platforms for Total in the North Sea, but the approach is very general and can be applied to a wide variety of other planning problems.
 \end{abstract}
 
 %%Graphical abstract
-\begin{graphicalabstract}
+%\begin{graphicalabstract}
 %\includegraphics{grabs}
-\end{graphicalabstract}
+%\end{graphicalabstract}
 
 %%Research highlights
-\begin{highlights}
-\item How to allow direct and real-time integration into an optimization process?
-\item How to perform optimization in a real-time changing parameter space?
-\end{highlights}
+%\begin{highlights}
+%\item How to allow direct and real-time integration into an optimization process?
+%\item How to perform optimization in a real-time changing parameter space?
+%\end{highlights}
 
 %% Keywords
 \begin{keyword}
 %% keywords here, in the form: keyword \sep keyword
-Large Neighborhood Search \sep Actor Framework \sep Real-time Optimization \sep Human-centered Computing \sep Interactive Systems and Tools \sep Decision Support Systems \sep Interactive Optimization.
+Large Neighborhood Search \sep Actor Framework \sep Maintenance scheduling \sep Real-time Optimization \sep Human-centered Computing \sep Interactive Systems and Tools \sep Decision Support Systems \sep Interactive Optimization.
 
 
 %% PACS codes here, in the form: \PACS code \sep code
@@ -206,62 +197,39 @@ Large Neighborhood Search \sep Actor Framework \sep Real-time Optimization \sep 
 \label{sec:1-introduction}
 %% Labels are used to cross-reference an item using \ref command.
 
-Maintenance scheduling is a dynamic and operational problem and have proven hard to solve and study in operation research due to the need of tight integration with tacit knowledge of decision makers and 
-the way that industry usually assigns responsibility for decision-making 
-to an individual representing only a small part of the complete process. 
+Maintenance scheduling is an operational problem that have proven hard to solve (NP-hard~\cite{???}). Furthermore, for optimization to be utilized the dynamic and uncertain nature of maintenance scheduling requires a tight integration with third party administration software to enable the tacit knowledge of decision makers to influence the planning process easily. Often a number of different decision makers at different company levels take part in the planning process and in this way the industry usually assigns responsibility for decision-making  to an individual representing only a small part of the complete process. 
 
-These multiple smaller processes are often difficult to map to a single mathematical model describing the whole system as elaborated by (\citep{barthelemy_human_2002}).
-Solving operation research problems that are operational in nature have additional requirements over conventional static problems: they have to be responsive to changing parameters; 
-able to be assimilated into the decision-makers workflow; allow for integration with dynamic data sources such as databases and RESTapi \citep{meignan_review_2015}. 
-Operational aspects of operation research, as opposed to higher level strategic and tactical aspects, are characterized by extensive amounts negotiation and feedback on 
-proposed schedules. The lack of integration and responsiveness can lead to schedules that are not directly implemented in practice but instead provides intial suggestions \cite{meignan_review_2015}, which are
-then iterated else where in the scheduling process. In \citep{barthelemy_human_2002} the authors argue that many problems that operation research aim to solve are often composed of a group of individuals whose decisions are 
-consolidated into an "epistemic subject" for which a mathematical model can be formulated and solved, with many scheduling problems being good examples. Furthermore, some multi-objective optimization problems are a product of 
-there being multiple actors in the decision making process each with different views on an optimal schedule from their vantage point rather then there being actual multiple objectives for each individual actor.
+These multiple smaller planning processes are often difficult to map to a single mathematical model describing the whole system as elaborated by (\citep{barthelemy_human_2002}). Solving operation research problems that are operational in nature have additional requirements over conventional static problems: they have to be responsive to changing parameters; able to be assimilated into the decision-makers workflow; allow for integration with dynamic data sources such as databases and RESTapi \citep{meignan_review_2015}. Operational aspects of operation research, as opposed to higher level strategic and tactical aspects, are characterized by extensive amounts negotiation and feedback on proposed schedules. The lack of integration and responsiveness can lead to schedules that are not directly implemented in practice but instead provides initial suggestions \cite{meignan_review_2015}, which are then iterated else where in the scheduling process. In \citep{barthelemy_human_2002} the authors argue that many problems that operation research aim to solve are often composed of a group of individuals whose decisions are consolidated into an "epistemic subject" for which a mathematical model can be formulated and solved, with many scheduling problems being good examples. However often multiple actors have different views on what constitutes an optimal schedule hence resulting in multiple-objectives. Even if multi-objective optimization~\citep{???} is applied to find the Pareto Front~\citep{???} a negotiating process still is needed between the actors to select the final schedule.
 
-This paper proposes a solution method that will allow for real-time optimization based on actor/user interaction and connection to a dynamic 
-data source, effectively meaning changes to the parameter space. The proposed solution method will be tested on the multi-compartment multi-knapsack problem (MCMKP) on a large dataset from a maintenance performing company. The MCMKP 
-naturally models what in the practical maintenance is called the weekly schedule, taken form \citep{palmerMaintenancePlanningScheduling2019}. It should be noted 
-that the scientific maintenance scheduling literature deviates significantly from its practical implementation which is detailed in \citep{palmerMaintenancePlanningScheduling2019}. 
-The solution method will by based on the large neighborhood search (LNS) metaheuristic. This meta heuristic was chosen due to its properties of naturally being able to work with and fix 
-infeasible solutions and its state of the art performance on various scheduling problems. 
+This paper proposes a solution method that will allow for real-time optimization based on actor/user interaction and connection to a dynamic data source, effectively managing the changes to the parameter space. The proposed solution method will be tested on the multi-compartment multi-knapsack problem (MCMKP) for maintenance scheduling on a large dataset from a company. The MCMKP naturally models what in the practical maintenance is called the weekly schedule, taken form \citep{palmerMaintenancePlanningScheduling2019}. It should be noted that the scientific maintenance scheduling literature deviates significantly from its practical implementation which is detailed in \citep{palmerMaintenancePlanningScheduling2019}. The solution method will by based on the large neighborhood search (LNS) metaheuristic. This meta heuristic was chosen due to its properties of naturally being able to work with and fix infeasible solutions and its state of the art performance on various scheduling problems. 
 
-To understand the need for actor-based methods some background knowledge will be required about the maintenance scheduling process. In figure \ref{fig:simple-maintenance-process} illustrates the general setup of a healthy maintenance planning and scheduling system. The systems actors have the 
-following responsibilies: the planner generates the work orders that are to be scheduled; the scheduler creates weekly schedules based on a knapsack formulation;
-based on the weekly schedule the supervisor assigns work order activities that the work order is composed of (the assignment problem); the technicians executes 
-the work in sequential pattern (single machine scheduling). A final point on the necessary of actor-based approaches to model should a setup is the 
-idea of ownership of a work order. Throughout the scheduling process a work order is owned by a specific actor and he alone is allow to modify it. 
-This means that a single model approach is very difficult to implement in practice as a work order looks different depending on the actor that 
-currently owns it. This also highlight another an point in maintenance scheduling: that the stochastic nature of the maintenance scheduling process
-handled using a change of model each with different levels of aggregation, opposed to more academic approaches such as fuzzy logic and stochastic optimization.
+To understand the need for actor-based methods some background knowledge will be required about the maintenance scheduling process. In figure \ref{fig:simple-maintenance-process} illustrates the general setup of a healthy maintenance planning and scheduling system. The systems actors have the following responsibilities: the planner generates the work orders that are to be scheduled; the scheduler creates weekly schedules based on a knapsack formulation; based on the weekly schedule the supervisor assigns work order activities that the work order is composed of (the assignment problem); the technicians executes the work in sequential pattern (single machine scheduling). A final point on the necessary of actor-based approaches to model should a setup is the idea of ownership of a work order. Throughout the scheduling process a work order is owned by a specific actor and he alone is allow to modify it. This means that a single model approach is very difficult to implement in practice as a work order looks different depending on the actor that currently owns it. This also highlight another an point in maintenance scheduling: that the stochastic nature of the maintenance scheduling process can be handled using a change of model each with different levels of aggregation, opposed to more academic approaches such as fuzzy logic and stochastic optimization.
 
-When the fundamental uncertainties manifest themselves during planning or execution work orders are rescheduled by moving between the different actor (models), meaning
-that the stochastic elements of maintenance scheduling are handled by dynamic rescheduling between the actors.
-
+When the fundamental uncertainties manifest themselves during planning or execution work orders are rescheduled by moving between the different actor (models), meaning that the stochastic elements of maintenance scheduling are handled by dynamic rescheduling between the actors.
 
 \begin{figure}
 \includegraphics[width=1.0\textwidth]{figures/Scheduling Process Simple.png}
-\caption{Simple overview of the scheduling process with its primary types of actors. The planner, the scheduler, the supervisor(s), and the 
-technicians. The green color highlights the scheduler as it the actor in the maintenance scheduling process that is the foundation for the paper.}
+\caption{Simple overview of the scheduling process with its primary types of actors. The planner, the scheduler, the supervisor(s), and the technicians. The green color highlights the scheduler as it the actor in the maintenance scheduling process that is the foundation for the paper.}
 \label{fig:simple-maintenance-process}
 \end{figure}
 
-The paper is divided into four different sections. Section \ref{sec:2-solution-method} explains the weekly maintenance scheduling model in detail and forms the fundation of the paper. 
-Section \ref{sec:3-results} shows that results coming from the implemented system where the implementation will be affected by simulated user-interaction. Section \ref{sec:4-discussion} 
-will discuss the implications of the research and possible future research directions.
+This article describes a number of contributions: 
 
-\subsection{The Weekly Schedule: Multi-compartment Multi-knapsack Problem with capacity penalties}
-\label{sub1sec2}
-The actor-based large neighborhood search is implemented on the MCMKP which models that weekly schedule in maintenance. 
-The model is comprised of 
-five different sets. $P$ is the number of weekly periods; $W$ is the number of work orders; $\tau$ is the number of different traits; $E$ is a set that
-defines which work orders should be excluded from a specific weekly period; $I$ is an inclusion set that defines the allocation of specific work orders 
-which should be included in a specific weekly period. The model has four parameters. $v_{pw}$ is the value of work order $w$ in weekly period $p$; $d$ is the 
-penalty for exceeding a specific trait capacity; $c_{w\tau}$ is the capacity requirement for work order $w$ for trait $t$; $cap_{p\tau}$ is the total amount 
-of capacity available in for weekly period p for for trait t. The model has 2 decision variables. $x_{wp}$, is a binary decision variable equal to one 
-if work order w is in weekly period p and zero otherwise; $pen_{p\tau}$ is non-negative decision variable equal to the amount of excess capacity above 
-the $cap_{p\tau}$ in weekly period p for trait $\tau$. The parameters $v$, $cap$, $Q$, and $P$ are functions of time, $\tau$, in this case as they will be 
-subject to change during the solution process.
+\begin{itemize}
+\item A novel actor/optimization framework
+\item A novel specialized (A)LNS metaheuristic, to be utilized in an actor framework
+\item Implementation and test on a large realworld maintenance scheduling problem
+\end{itemize}
+
+The paper is divided into four different sections. Section \ref{sec:2-solution-method} explains the weekly maintenance scheduling model in detail and forms the fundation of the paper. Section \ref{sec:3-results} shows that results coming from the implemented system where the implementation will be affected by simulated user-interaction. Section \ref{sec:4-discussion} will discuss the implications of the research and possible future research directions.
+
+\subsection{A generic maintenance scheduling model}
+\label{sub2sec2}
+A large company needs to create a weekly maintenance plan for the next $p \in P$ weeks. The maintenance plan is planned centrally and consists of scheduling the $w \in W$ work orders, i.e. maintenance tasks, such that all are scheduled into different weeks. Each work order requires some recourse's to be carried out, e.g. man-power with different qualifications, equipment etc. all of these recourse's are available in limited amounts and are called traits $\tau \in T$. To simplify matters, we will assume that the recourse limits are not hard but extra workers can be paid overtime, extra equipment can be rented etc., at the cost (penalty) of $pen_{p\tau}$. The urgency of the different maintenance operations varies and is reflected in a penalty for carrying out a maintenance work order in a certain week $v_{wp}(t)$. Urgent tasks have quickly increasing penalties for the later weeks week $p$. Furthermore, two sets exists which will either will require the work order to be carried out in week $p$, i.e. $(w,p) \in E$ and a set which forbids a work order to carried out in week $p$, i.e. $(w,p) \in I$. The model for the problem is the Multi-compartment Multi-knapsack Problem with capacity penalties MCMKP.
+
+%\subsection{The Weekly Schedule: Multi-compartment Multi-knapsack Problem with capacity penalties}
+%\label{sub2sec2}
+%The actor-based large neighborhood search is implemented on the MCMKP which models that weekly schedule in maintenance. The model is comprised of five different sets. $P$ is the number of weekly periods; $W$ is the number of work orders; $\tau$ is the number of different traits; $E$ is a set that defines which work orders should be excluded from a specific weekly period; $I$ is an inclusion set that defines the allocation of specific work orders which should be included in a specific weekly period. The model has four parameters. $v_{pw}$ is the value of work order $w$ in weekly period $p$; $d$ is the penalty for exceeding a specific trait capacity; $c_{w\tau}$ is the capacity requirement for work order $w$ for trait $t$; $cap_{p\tau}$ is the total amount of capacity available in for weekly period p for for trait t. The model has 2 decision variables. $x_{wp}$, is a binary decision variable equal to one if work order w is in weekly period p and zero otherwise; $pen_{p\tau}$ is non-negative decision variable equal to the amount of excess capacity above the $cap_{p\tau}$ in weekly period p for trait $\tau$. The parameters $v$, $cap$, $Q$, and $P$ are functions of time, $\tau$, in this case as they will be subject to change during the solution process.
 
 \begin{alignat}{2}
 	& \text{Min} \quad \sum_{w = 1}^{W} \sum_{p = 1}^{P} v_{wp}(t) \cdot x_{wp}(t) + \sum_{p = 1}^{P} \sum_{\tau = 1}^T d \cdot pen_{p\tau}(t)   \label{eqn:objective_function_strategic} \\[1em]
@@ -274,12 +242,7 @@ subject to change during the solution process.
 	& pen_{p\tau}(t) \in \mathbb{R}^{+}                                         && \forall p \in P, \forall \tau \in T                      \label{eqn:p_non_negativity_constraint}
 \end{alignat}
 
-The objective function \ref{eqn:objective_function_strategic} minimizes the total weight of all work order assignments together with the penalty $d$ for exceeding the 
-capacity given in constraint \ref{eqn:capacity_constraint}. Constraint \ref{eqn:capacity_constraint} ensures that all the weights $c_{w\tau}$ for each activity in an work order, given that it
-has been assigned, is lower than the capacity for each period and for each trait $\tau$. $pen_{p\tau}$ is the amount of exceeded capacity that is needed for the current assignment of work order to be feasible.
-Constraint \ref{eqn:single_workorder_constraint} makes sure that each work order is assigned to atleast a single period. Constraint \ref{eqn:exclusion_constraint} excludes a work order from a 
-certain period and constraint \ref{eqn:inclusion_constraint} forces a specific work order to be in a specific period. Constraint \ref{eqn:x_integrality_constraint} and \ref{eqn:p_non_negativity_constraint} 
-specify the variable domain for $x_{wp}$ and $pen_{p\tau}$ respectively. The effects of changing $E$, $I$, $cap$, and $v$ in real-time will be examined to determine their effects on the weekly schedules and objective value.
+The objective function \eqref{eqn:objective_function_strategic} minimizes the total weight of all work order assignments together with the penalty $d$ for exceeding the capacity given in constraint \eqref{eqn:capacity_constraint}. Constraint \eqref{eqn:capacity_constraint} ensures that all the weights $c_{w\tau}$ for each activity in an work order, given that it has been assigned, is lower than the capacity for each period and for each trait $\tau$. $pen_{p\tau}$ is the amount of exceeded capacity that is needed for the current assignment of work order to be feasible. Constraint \eqref{eqn:single_workorder_constraint} makes sure that each work order is assigned to at least a single period. Constraint \eqref{eqn:exclusion_constraint} excludes a work order from a certain period and constraint \eqref{eqn:inclusion_constraint} forces a specific work order to be in a specific period. Constraint \eqref{eqn:x_integrality_constraint} and \eqref{eqn:p_non_negativity_constraint} specify the variable domain for $x_{wp}$ and $pen_{p\tau}$ respectively. The effects of changing $E$, $I$, $cap$, and $v$ in real-time will be examined to determine their effects on the weekly schedules and objective value.
 
 \section{Solution Method}
 \label{sec:2-solution-method}
@@ -344,8 +307,8 @@ that the algorithm does not need to restart to handle changes in data.
 \end{algorithmic}
 \end{algorithm}
 
-The basic LNS setup have here been extended with a `message queue`. This message queue will be read from on every iteration of the LNSs main iteration loop. Here we notice that the 
-incoming message are able to change both the solutoin but also the problem instance itself. Here we see one of the defining features of the LNS metaheuristic in play, that due to its inherrent 
+The basic LNS setup have here been extended with a `message queue`. This message queue will be read from on every iteration of the LNS's main iteration loop. Here we notice that the 
+incoming message is able to change both the solution but also the problem instance itself. Here we see one of the defining features of the LNS metaheuristic in play, that due to its inherent 
 property of being able to optimize a solution that have become infeasible which is something that is very likely to happen when you change the parameter of the problem instance itself. 
 
 Another less obvious property the message queue allows is for the algorithm to run indefinitely and instead of restarting the algorithm you instead pass 
@@ -466,8 +429,8 @@ $\Delta |v|$ & $1 \cdot 10^{5}$                                         & $2 \cd
 \label{sec:4-discussion}
 
 Maintenance scheduling efficiently solves a complex scheduling problem by the use of multiple actors. Through the use of actors the 
-process handles uncertain that is difficult to reason about using models with different levels of aggregation where each actors understands
-how to exploit his model to the fullest. As the uncertainties manifest themselves the actors/models handle the uncertainty through 
+process handles uncertainty that is difficult to reason about, using models with different levels of aggregation where each actors understands
+how to exploit his model. As uncertainties manifest themselves the actors/models handle the uncertainty through 
 communication. To further understand the implications of the approach the discussion will be divided into three sections: 1. actors and 
 integration; 2. continuous optimization allows asynchronous optimization; 3. future research.
 
