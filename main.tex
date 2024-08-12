@@ -244,35 +244,53 @@ A large company needs to create a weekly maintenance plan for the next $p \in P$
 
 The objective function \eqref{eqn:objective_function_strategic} minimizes the total weight of all work order assignments together with the penalty $d$ for exceeding the capacity given in constraint \eqref{eqn:capacity_constraint}. Constraint \eqref{eqn:capacity_constraint} ensures that all the weights $c_{w\tau}$ for each activity in an work order, given that it has been assigned, is lower than the capacity for each period and for each trait $\tau$. $pen_{p\tau}$ is the amount of exceeded capacity that is needed for the current assignment of work order to be feasible. Constraint \eqref{eqn:single_workorder_constraint} makes sure that each work order is assigned to at least a single period. Constraint \eqref{eqn:exclusion_constraint} excludes a work order from a certain period and constraint \eqref{eqn:inclusion_constraint} forces a specific work order to be in a specific period. Constraint \eqref{eqn:x_integrality_constraint} and \eqref{eqn:p_non_negativity_constraint} specify the variable domain for $x_{wp}$ and $pen_{p\tau}$ respectively. The effects of changing $E$, $I$, $cap$, and $v$ in real-time will be examined to determine their effects on the weekly schedules and objective value.
 
-\section{Solution Method}
+\subsection{A workflow supporting framework}
+As described by Figure~\ref{fig:simple-maintenance-process} the four major actors are the planner, the scheduler, the supervisors and the technicians. What is not illustrated by Figure~\ref{fig:simple-maintenance-process} is the iterative nature of the process. For each of the actors, unforeseen events can happen:
+
+\begin{itemize}
+    \item For the planner/scheduler, directives from top management may force the planner to require updates to the strategic plan
+    \item For the scheduler, new breakdowns may force emergency maintenance taking priority of the work in the current week. Hence, forcing work orders planned for this week out, but maybe forcing work order planned in the following weeks to be prioritized to this week.
+    \item For the technician, it is likely that there are surprises regarding the work orders to be handled: They may take longer time, forcing other work orders of the day out, or shorter time.
+\end{itemize}
+
+All of these dynamical changes happen frequently, and should not be treated as emergencies or rare events, because they are not: To the planners these dynamic changes are a fact of life and the overall scheduling system should facilitate the handling of such events. Hence what is needed is an IT scheduling system, which integrates the four actors such that the overall multi-week schedule is constantly updated by new requirements from the supervisor(s), and the week schedule is constantly updated by new requirements from the technician. Such an IT system would have two major parts:
+
+\begin{itemize}
+    \item An information data-base and GUI system, which makes it easy for the actors to update the system, or receive events from the company ERP system.
+    \item A decision support planning part, relying on optimization for:
+    \begin{itemize}
+        \item The Scheduler: Create/update the multi-week plan, based on the newest information
+        \item The supervisor: Create/update the current-week schedule, based on the newest information
+        \item The technician: Schedule the work order list of the day, based on the newest information
+    \end{itemize}
+\end{itemize}
+
+The three different planning problems can be done manually, but faster and better results can be achieved by using optimization algorithms, particularly for the multi-week plan and the current-week plan. The MCMKP problem defined by the Mixed Integer Programming (MIP) model given by the equations \eqref{eqn:objective_function_strategic}-\eqref{eqn:p_non_negativity_constraint} can be utilized for the multi-week plan problem, to offer decision support for the scheduler.
+
+\section{Multi-week optimization Approach}
 \label{sec:2-solution-method}
+The multi-week plan MIP model MCMKP can be solved using standard MIP solvers like Gurobi~\cite{???}. However, given that the MCMKP is NP-hard~\cite{???}, for larger MCMKP, with thousands of work orders over many months, this leads to unsatisfactory solution times. Furthermore, the importance of optimal solution is less for the multi-week plan, since many dynamical changes are expected rendering the optimal plans outdated. Instead a heuristic is used which should be able to achieve near optimal solutions fast and which can be integrated into a framework.
 
 \subsection{Actor-based Large Neighborhood Search}
-A problem which is affected by user-interaction and requires real-time feedback needs an optimization approach that is able to repair infeasible schedules and while also 
-converging quickly. For this the large neighborhood search metaheuristic has been shown satisfy these requirements in the literature \cite{gendreau_handbook_2019}. 
+A problem which is affected by user-interaction and requires real-time feedback needs an optimization approach that is able to repair infeasible schedules and while also converging quickly. Large Neighborhood Search (LNS)~\cite{shaw1998using} metaheuristic has been shown satisfy these requirements in the literature~\cite{gendreau_handbook_2019}. 
 
-The LNS metaheuristic is defined for static problems, meaning that the parameters that make up the problem instance is not subject to change 
-after the algorithm has been started. To make the LNS able adapt to changing parameters in real-time a message system have been implemented into the existing framework. This 
-extension is shown in algorithm \ref{algo1}.  
+The LNS metaheuristic is defined for static problems, meaning that the parameters that make up the problem instance is not subject to change after the algorithm has been started. To make the LNS able adapt to changing parameters in real-time a message system have been integrated into the LNS algorithm. This extension is shown in algorithm \ref{algo1}.  
 
 \subsubsection{Messages And Destructors}
-LNS in its most basic form has one constructor and one destructor which repeatedly destroy and rebuild the schedule. For the AbLNS we will generalize on this concept by 
-including messages as destructors of the classic LNS implementation. This generalization can be seen as being somewhat similar to how the adaptive LNS (ALNS) is formulated,
-but where the different constructors and destructors are chosen externally as well. 
+LNS in its most basic form has one constructor and one destructor which repeatedly destroy and rebuild the schedule. For the Actor-based Large Neighborhood Search (AbLNS) we will generalize on this concept by including messages as destructors of the classic LNS implementation. This generalization can be seen as being somewhat similar to how the Adaptive LNS (ALNS)~\cite{ropke2006adaptive} is formulated, but where the different constructors and destructors are chosen externally as well. 
 
 Extending on the classic setup we define the following set of destructors, $M$:
 
 \begin{itemize}
-	\item $m_1$: Inclusion destruct message	
-	\item $m_2$: Exclusion destruct message	
-	\item $m_3$: Capacities destruct message	
-	\item $m_4$: Weights destruct message	
-	\item $m_5$: Random destruct message
+	\item $m_1$: Inclusion destruct message: Which work-orders should be included from which weeks
+	\item $m_2$: Exclusion destruct message: Which work-orders should be excluded from which weeks
+	\item $m_3$: Capacities destruct message: Which increase/decrease the capactity of a trait.
+	\item $m_4$: Weights destruct message: Change the objective weights
+	\item $m_5$: Random destruct message: Remove a random set of work-orders from the current multi-week plan
 \end{itemize}
 
 Each of these messages affect different parts of the MCMK problem (weekly schedule). Notice
-here that the first four messages destruct the solution by changing the parameter space and the last message is 
-a random destructor.
+here that the first four messages destruct the solution by changing the parameter space and the last message is a random destructor.
 
 Generalizing the destructors from being static structures into messages
 allows the solution to change in real-time to a changing paramenter space meaning
@@ -307,13 +325,9 @@ that the algorithm does not need to restart to handle changes in data.
 \end{algorithmic}
 \end{algorithm}
 
-The basic LNS setup have here been extended with a `message queue`. This message queue will be read from on every iteration of the LNS's main iteration loop. Here we notice that the 
-incoming message is able to change both the solution but also the problem instance itself. Here we see one of the defining features of the LNS metaheuristic in play, that due to its inherent 
-property of being able to optimize a solution that have become infeasible which is something that is very likely to happen when you change the parameter of the problem instance itself. 
+The basic LNS setup have here been extended with a `message queue`. This message queue will be read from on every iteration of the LNS's main iteration loop. Here we notice that the incoming message is able to change both the solution but also the problem instance itself. Here we see one of the defining features of the LNS metaheuristic in play, that due to its inherent property of being able to optimize a solution that have become infeasible which is something that is very likely to happen when you change the parameter of the problem instance itself. 
 
-Another less obvious property the message queue allows is for the algorithm to run indefinitely and instead of restarting the algorithm you instead pass 
-messages to it to allow it be adjust both the solution space and the parameter space.
-This property avoid the issue of time consuming initial convergence as the algorithm will be found in an optimimal state when the solution is perturbed.  
+Another less obvious property the message queue allows is for the algorithm to run indefinitely and instead of restarting the algorithm you instead pass messages to it to allow it be adjust both the solution space and the parameter space. This property avoid the issue of time consuming initial convergence as the algorithm will be started from a (probably) good starting solution.
 
 \section{Results}
 \label{sec:3-results}
