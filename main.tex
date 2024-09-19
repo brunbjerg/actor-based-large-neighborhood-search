@@ -153,7 +153,7 @@
 %% Abstract
 \begin{abstract}
 %% Text of abstract
-Many planning problems facing the operations research field have proven difficult to solve due to their inherent uncertainty and highly dynamic nature. Stochastic optimization~\citep{???}, fuzzy logic~\citep{???}, and robust optimization~\citep{???} are some of the methods that have been proposed to solve these issues. These methods make an implicit assumption of a static data setting and a static problem setting. Maintenance scheduling is one such problem where the best available information continually updates and then therefore the scheduling continuously needs to be updated. Maintenance scheduling is a complex process often more associated with operation management, but here we will argue that is possible to implement general maintenance scheduling approaches, if the solution approach is designed to be integrated into a business
+Many planning problems facing the operations research field have proven difficult to solve due to their inherent uncertainty and highly dynamic nature. Stochastic optimization~\citep{???}, fuzzy logic~\citep{???}, and robust optimization~\citep{???} are some of the methods that have been proposed to solve these issues. These methods make an implicit assumption of a static data setting and a static problem setting and then attempts to prepare the plans for a changing or uncertain future. Maintenance scheduling is one such problem where the best available information is continually updated and then therefore the scheduling continuously needs to be updated. Maintenance scheduling is a complex process often more associated with operation management, but here we will argue that is possible to implement general maintenance scheduling approaches, if the solution approach is designed to be integrated into a business
 process of the kind that are usually developed by the principles of operation management. 
 
 This paper proposes a novel optimization method that is capable to optimizing a scheduling problem in the following setting:  Primary data source is changing in real-time; external inputs affects the optimization process; multiple actors are making interdependent decision whose objectives may differ significantly. The proposed solution approach is an actor-based framework including a large neighborhood search metaheuristic implementation. The framework is tested on the real-world problem of maintaining scheduling of oil platforms for Total in the North Sea, but the approach is very general and can be applied to a wide variety of other planning problems.
@@ -217,15 +217,25 @@ This article describes a number of contributions:
 
 \begin{itemize}
 \item A novel actor/optimization framework
-\item A novel specialized (A)LNS metaheuristic, to be utilized in an actor framework
-\item Implementation and test on a large realworld maintenance scheduling problem
+\item A LNS metaheuristic which is specialized to be utilized in an actor framework
+\item Implementation and test on a large real world maintenance scheduling problem
 \end{itemize}
 
-The paper is divided into four different sections. Section \ref{sec:2-solution-method} explains the weekly maintenance scheduling model in detail and forms the fundation of the paper. Section \ref{sec:3-results} shows that results coming from the implemented system where the implementation will be affected by simulated user-interaction. Section \ref{sec:4-discussion} will discuss the implications of the research and possible future research directions.
+The paper is divided into four different sections. Section \ref{sec:2-solution-method} explains the weekly maintenance scheduling model in detail and forms the foundation of the paper. Section \ref{sec:3-results} shows that results coming from the implemented system where the implementation will be affected by simulated user-interaction. Section \ref{sec:4-discussion} will discuss the implications of the research and possible future research directions.
 
 \subsection{A generic maintenance scheduling model}
 \label{sub2sec2}
-A large company needs to create a weekly maintenance plan for the next $p \in P$ weeks. The maintenance plan is planned centrally and consists of scheduling the $w \in W$ work orders, i.e. maintenance tasks, such that all are scheduled into different weeks. Each work order requires some recourse's to be carried out, e.g. man-power with different qualifications, equipment etc. all of these recourse's are available in limited amounts and are called traits $\tau \in T$. To simplify matters, we will assume that the recourse limits are not hard but extra workers can be paid overtime, extra equipment can be rented etc., at the cost (penalty) of $pen_{p\tau}$. The urgency of the different maintenance operations varies and is reflected in a penalty for carrying out a maintenance work order in a certain week $v_{wp}(t)$. Urgent tasks have quickly increasing penalties for the later weeks week $p$. Furthermore, two sets exists which will either will require the work order to be carried out in week $p$, i.e. $(w,p) \in E$ and a set which forbids a work order to carried out in week $p$, i.e. $(w,p) \in I$. The model for the problem is the Multi-compartment Multi-knapsack Problem with capacity penalties MCMKP.
+A large company needs to create a weekly maintenance plan for the next $p \in P$ weeks. The maintenance plan is planned centrally and consists of scheduling the $w \in W$ work orders, i.e. maintenance tasks, such that all are scheduled into different weeks. Each work order requires some recourse's to be carried out, e.g. man-power with different qualifications, equipment etc. all of these recourse's are available in limited amounts and are called traits $\tau \in T$. To simplify matters, we will assume that the recourse limits are not hard but extra workers can be paid overtime, extra equipment can be rented etc., at the cost (penalty) of $pen_{p\tau}$. The urgency of the different maintenance operations varies and is reflected in a penalty for carrying out a maintenance work order in a certain week $v_{wp}$. Urgent tasks have quickly increasing penalties for the later weeks week $p$. Furthermore, two sets exists which will either will require the work order to be carried out in week $p$, i.e. $(w,p) \in E$ and a set which forbids a work order to carried out in week $p$, i.e. $(w,p) \in I$. The \textbf{static} model for the problem is the Multi-compartment Multi-knapsack Problem with capacity penalties MCMKP.
+
+In this case however, the problem is a \textbf{dynamic} problem, i.e. a Dynamical Combinatorial Optimization problem (DCOP)~\cite{yang2013metaheuristics}. Hence, while the structure of the problem is assumed to remain static, certain data may dynamically change over time. The parts of the model which can change are marked with $(t)$, i.e. the timeslot $(t)$ version of the DCOP problem:
+
+\begin{itemize}
+\item The variables $x_{wp}(t) \in \{0,1\}$ and $pen_{p\tau}(t) \in R^+$: For each timestep $(t)$ these are optimized
+\item $v_{wp}(t)$ : The objective penalties, may be changed to reflect other priorities regarding the scheduling of the individual work orders $w$ in period $(t)$
+\item $E(t)$ and $I(t)$, exclusion and inclusion sets of work orders into specific weeks. 
+\end{itemize}
+
+What is considered stable over the planning period is the number of traits and the penalty for over usage of a trait. The full dynamical MCMKP(t) is given below:
 
 %\subsection{The Weekly Schedule: Multi-compartment Multi-knapsack Problem with capacity penalties}
 %\label{sub2sec2}
@@ -235,7 +245,7 @@ A large company needs to create a weekly maintenance plan for the next $p \in P$
 	& \text{Min} \quad \sum_{w = 1}^{W} \sum_{p = 1}^{P} v_{wp}(t) \cdot x_{wp}(t) + \sum_{p = 1}^{P} \sum_{\tau = 1}^T d \cdot pen_{p\tau}(t)   \label{eqn:objective_function_strategic} \\[1em]
     & \text{subject to:} \notag                                                                                                                                        \\[1em]
 	& \sum_{w = 1}^W c_{w\tau} \cdot x_{wp}(t) \leq \ cap_{p\tau}(t) + pen_{p\tau}(t)        && \forall p \in P, \forall \tau \in T                      \label{eqn:capacity_constraint}          \\[1em]
-	& \sum_{w = 1}^{W} x_{wp}(t) = 1                                            && \forall p \in P                                       \label{eqn:single_workorder_constraint}  \\[1em]
+	& \sum_{w = 1}^{W} x_{wp}(t) = 1                                            && \forall w \in W                                       \label{eqn:single_workorder_constraint}  \\[1em]
 	& x_{wp}(t) = 0                                                             && \forall (w, p) \in E(t)                               \label{eqn:exclusion_constraint}         \\[1em]
 	& x_{wp}(t) = 1                                                             && \forall (w, p) \in I(t)                               \label{eqn:inclusion_constraint}         \\[1em]
 	& x_{wp}(t) \in \{0, 1\}                                                    && \forall w \in W, \forall p \in P                      \label{eqn:x_integrality_constraint}     \\[1em] 
@@ -248,15 +258,15 @@ The objective function \eqref{eqn:objective_function_strategic} minimizes the to
 As described by Figure~\ref{fig:simple-maintenance-process} the four major actors are the planner, the scheduler, the supervisors and the technicians. What is not illustrated by Figure~\ref{fig:simple-maintenance-process} is the iterative nature of the process. For each of the actors, unforeseen events can happen:
 
 \begin{itemize}
-    \item For the planner/scheduler, directives from top management may force the planner to require updates to the strategic plan
+    \item For the planner may receive directives from top management message the planner and require updates to the strategic plan
     \item For the scheduler, new breakdowns may force emergency maintenance taking priority of the work in the current week. Hence, forcing work orders planned for this week out, but maybe forcing work order planned in the following weeks to be prioritized to this week.
-    \item For the technician, it is likely that there are surprises regarding the work orders to be handled: They may take longer time, forcing other work orders of the day out, or shorter time.
+    \item For the technician, it is likely that there are surprises regarding the work orders to be handled: They may take longer time, forcing other work orders of the day out.
 \end{itemize}
 
-All of these dynamical changes happen frequently, and should not be treated as emergencies or rare events, because they are not: To the planners these dynamic changes are a fact of life and the overall scheduling system should facilitate the handling of such events. Hence what is needed is an IT scheduling system, which integrates the four actors such that the overall multi-week schedule is constantly updated by new requirements from the supervisor(s), and the week schedule is constantly updated by new requirements from the technician. Such an IT system would have two major parts:
+All of these dynamical changes happen frequently, and should not be treated as emergencies or rare events, because they are not: To the planners these dynamic changes are a fact of life and the overall scheduling system should facilitate the handling of such events. Hence what is needed is an IT optimization scheduling system, which integrates the four actors such that the overall multi-week schedule is constantly updated by new requirements from the supervisor(s), and the week schedule is constantly updated by new requirements from the technician. Such an IT system would have two major parts:
 
 \begin{itemize}
-    \item An information data-base and GUI system, which makes it easy for the actors to update the system, or receive events from the company ERP system.
+    \item An information data-base and GUI system, which makes it easy for the actors to update the system, or receive events from the company ERP system, e.g. SAP~\cite{???}.
     \item A decision support planning part, relying on optimization for:
     \begin{itemize}
         \item The Scheduler: Create/update the multi-week plan, based on the newest information
@@ -269,10 +279,10 @@ The three different planning problems can be done manually, but faster and bette
 
 \section{Multi-week optimization Approach}
 \label{sec:2-solution-method}
-The multi-week plan MIP model MCMKP can be solved using standard MIP solvers like Gurobi~\cite{???}. However, given that the MCMKP is NP-hard~\cite{???}, for larger MCMKP, with thousands of work orders over many months, this leads to unsatisfactory solution times. Furthermore, the importance of optimal solution is less for the multi-week plan, since many dynamical changes are expected rendering the optimal plans outdated. Instead a heuristic is used which should be able to achieve near optimal solutions fast and which can be integrated into a framework.
+The multi-week plan MIP model MCMKP can be solved using standard MIP solvers like Gurobi~\cite{???}. However, given that the MCMKP is NP-hard~\cite{???}, for larger MCMKP, with thousands of work orders over many months, this leads to unsatisfactory solution times. Furthermore, the importance of optimal solution is less for the multi-week plan, since many dynamical changes are expected rendering the optimal plans outdated. Instead a heuristic optimization is used which should be able to achieve near optimal solutions fast and which can be integrated into a framework of actors: When receiving messages from the different actors, the heuristic optimization algorithm should quickly incorporate these into a feasible and optimized plan.
 
 \subsection{Actor-based Large Neighborhood Search}
-A problem which is affected by user-interaction and requires real-time feedback needs an optimization approach that is able to repair infeasible schedules and while also converging quickly. Large Neighborhood Search (LNS)~\cite{shaw1998using} metaheuristic has been shown satisfy these requirements in the literature~\cite{gendreau_handbook_2019}. 
+A problem which is affected by user-interaction and requires real-time feedback needs an optimization approach that is able to repair infeasible schedules and while also converging quickly to a stable optimized solution. Large Neighborhood Search (LNS)~\cite{shaw1998using} metaheuristic has been shown satisfy these requirements in the literature~\cite{gendreau_handbook_2019}. 
 
 The LNS metaheuristic is defined for static problems, meaning that the parameters that make up the problem instance is not subject to change after the algorithm has been started. To make the LNS able adapt to changing parameters in real-time a message system have been integrated into the LNS algorithm. This extension is shown in algorithm \ref{algo1}.  
 
@@ -282,19 +292,16 @@ LNS in its most basic form has one constructor and one destructor which repeated
 Extending on the classic setup we define the following set of destructors, $M$:
 
 \begin{itemize}
-	\item $m_1$: Inclusion destruct message: Which work-orders should be included from which weeks
-	\item $m_2$: Exclusion destruct message: Which work-orders should be excluded from which weeks
-	\item $m_3$: Capacities destruct message: Which increase/decrease the capactity of a trait.
-	\item $m_4$: Weights destruct message: Change the objective weights
+	\item $m_1$: Inclusion destruct message: Which work-orders should be included from which weeks, i.e. update the $I(t)$ set
+	\item $m_2$: Exclusion destruct message: Which work-orders should be excluded from which weeks, i.e. update the $E(t)$ set
+	\item $m_3$: Capacities destruct message: Which increase/decrease the capacity of a trait.
+	\item $m_4$: Weights destruct message: Change the objective weights/penalties
 	\item $m_5$: Random destruct message: Remove a random set of work-orders from the current multi-week plan
 \end{itemize}
 
-Each of these messages affect different parts of the MCMK problem (weekly schedule). Notice
-here that the first four messages destruct the solution by changing the parameter space and the last message is a random destructor.
+Each of these messages affect different parts of the MCMK problem (weekly schedule). Notice here that the first four messages destruct the solution by changing the parameter space and the last message is a random destructor.
 
-Generalizing the destructors from being static structures into messages
-allows the solution to change in real-time to a changing paramenter space meaning
-that the algorithm does not need to restart to handle changes in data. 
+Generalizing the destructors from being static structures into messages allows the solution to change in real-time to a changing parameter space meaning that the algorithm does not need to restart to handle changes in data. 
 
 \begin{algorithm}[H]
 \caption{Actor-based Large Neighborhood Search}  \label{algo1}
